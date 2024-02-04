@@ -23,21 +23,17 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->post('login', 'LumenAuthController@login');
     $router->post('logout', 'LumenAuthController@logout');
     $router->post('refresh', 'LumenAuthController@refresh');
-    $router->post('me', 'LumenAuthController@me');
-    $router->get('/check', ['middleware' => 'auth', function () use ($router) {
-        return 'Tiene permiso';
-    }]);
-
 });
 
 
 
 $router->group(['prefix' => 'api','middleware' => 'auth'], function () use ($router) {
-        $router->group(['prefix' => 'worker'], function () use ($router) {
+    $router->post('me', 'LumenAuthController@me');
+    $router->group(['prefix' => 'worker'], function () use ($router) {
             $router->get('','Catalogos\WorkerController@index');
             $router->get('/get/{id}','Catalogos\WorkerController@show');
             $router->post('','Catalogos\WorkerController@store');
-            $router->put('/{id}','Catalogos\WorkerController@update');
+            $router->post('/{id}','Catalogos\WorkerController@update');
             $router->delete('/{id}/delete','Catalogos\WorkerController@destroy');
         });
 });
