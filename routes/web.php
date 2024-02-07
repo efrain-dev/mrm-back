@@ -25,8 +25,6 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->post('refresh', 'LumenAuthController@refresh');
 });
 
-
-
 $router->group(['prefix' => 'api','middleware' => 'auth'], function () use ($router) {
     $router->post('me', 'LumenAuthController@me');
     $router->group(['prefix' => 'worker'], function () use ($router) {

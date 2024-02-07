@@ -20,10 +20,12 @@ return new class extends Migration
             $table->date('date_out')->nullable();
             $table->date('birthdate');
             $table->string('social_number');
-            $table->string('charge');
+            $table->string('rate_night');
             $table->string('email')->unique();
             $table->string('address');
             $table->string('contact');
+            $table->boolean('active')->default(true);
+
             $table->timestamps();
         });
     }
