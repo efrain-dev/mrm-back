@@ -52,12 +52,14 @@ class WorkerController extends Controller
         $birthdate = $request->get('birthdate');
         $filter = $request->get('filter') ?: '';
         $active = $request->get('active');
-
-        $hire['from'] = $hire['from'] ? Carbon::parse($hire['from']) : Carbon::now()->startOfYear()->startOfMonth();
-        $hire['to'] = $hire['to'] ? Carbon::parse($hire['to'])->addDay() : Carbon::now()->addMonth()->startOfMonth();
-        $birthdate['from'] = $birthdate['from'] ? Carbon::parse($birthdate['from']) : Carbon::now()->startOfMonth();
-        $birthdate['to'] = $birthdate['to'] ? Carbon::parse($birthdate['to'])->addDay() : Carbon::now()->addMonth()->startOfMonth();
-
+        if ($hire['active']){
+            $hire['from'] = $hire['from'] ? Carbon::parse($hire['from']) : Carbon::now()->startOfYear()->startOfMonth();
+            $hire['to'] = $hire['to'] ? Carbon::parse($hire['to'])->addDay() : Carbon::now()->addMonth()->startOfMonth();
+        }
+        if ($birthdate['active']){
+            $birthdate['from'] = $birthdate['from'] ? Carbon::parse($birthdate['from']) : Carbon::now()->startOfMonth();
+            $birthdate['to'] = $birthdate['to'] ? Carbon::parse($birthdate['to'])->addDay() : Carbon::now()->addMonth()->startOfMonth();
+        }
         return [$hire, $birthdate, $filter, $active];
     }
 
