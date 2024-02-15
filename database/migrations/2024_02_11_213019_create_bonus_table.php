@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateGlobalTable extends Migration
+class CreateBonusTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,10 @@ class CreateGlobalTable extends Migration
      */
     public function up()
     {
-        Schema::create('global', function (Blueprint $table) {
+        Schema::create('bonus', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
+            $table->string('type',1);
         });
     }
 
@@ -26,6 +27,6 @@ class CreateGlobalTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('global');
+        Schema::dropIfExists('bonus');
     }
 }

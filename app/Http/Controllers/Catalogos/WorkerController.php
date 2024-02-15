@@ -83,12 +83,12 @@ class WorkerController extends Controller
             Worker::create($data);
             return response()->json([
                 'status' => 1,
-                'message' => 'Worker creado con exito'
+                'message' => 'Worker successfully created'
             ]);
         } catch (\Illuminate\Database\QueryException $e) {
             return response()->json([
                 'status' => 0,
-                'message' => 'A ocurrido una excpecion' . $e->getMessage()
+                'message' => 'An exception has occurred' . $e->getMessage()
             ], 500);
         }
 
@@ -97,7 +97,6 @@ class WorkerController extends Controller
 
     public function show($id)
     {
-
         $item = Worker::find($id);
         return response()->json($item);
     }
@@ -127,12 +126,12 @@ class WorkerController extends Controller
             $worker->save();
             return response()->json([
                 'status' => 1,
-                'message' => 'Trabajador actualizado con exito'
+                'message' => 'Successfully updated worker'
             ]);
         } catch (\Illuminate\Database\QueryException $e) {
             return response()->json([
                 'status' => 0,
-                'message' => 'A ocurrido una excpecion'
+                'message' => 'An exception has occurred' . $e->getMessage()
             ], 500);
         }
 
@@ -145,12 +144,12 @@ class WorkerController extends Controller
             $worker->delete();
             return response()->json([
                 'status' => 1,
-                'message' => 'Trabajador eliminado con exito'
+                'message' => 'Worker successfully removed'
             ]);
         } catch (\Illuminate\Database\QueryException $e) {
             return response()->json([
                 'status' => 0,
-                'message' => 'A ocurrido una excpecion al intentar eliminar'
+                'message' => 'An exception has occurred' . $e->getMessage()
             ], 500);
         }
     }

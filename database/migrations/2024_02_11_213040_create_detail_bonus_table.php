@@ -19,6 +19,7 @@ class CreateDetailBonusTable extends Migration
             $table->foreign('id_bonus','fk_detail_bonus')->references('id')->on('bonus');
             $table->string('calc')->comment('Tipo 1 es monto fino 2 es porcentual')->default('1');
             $table->decimal('amount');
+            $table->boolean('general')->default(true);
             $table->boolean('active')->default(true);
             $table->timestamps();
         });
