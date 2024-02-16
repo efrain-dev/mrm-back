@@ -14,19 +14,21 @@ use Illuminate\Support\Facades\DB;
 
 class BonusController extends Controller
 {
-    public function index(Request $request)
-    {
-
-        $bonus = DB::table('bonus')->get();
-        $bonus->map(function ($data) {
-            $detail = DB::table('detail_bonus')->where('id_bonus', '=', $data->id)->where('active', '=', 1)->first();
-            $data->id_detail = $detail->id;
-            $data->calc = $detail->calc;
-            $data->amount = $detail->amount;
-        });
+    public function index(Request $request,$type)
+    {     $query = DB::table('bonus')->join('detail_bonus','detail_bonus.id_bonus','=','bonus.id');
+        if ($type){
+            $query = $query->where('permanent','=',true);
+        }else{
+            $query = $query->where('permanent','=',false);
+        }
+        $bonus = $query->get();
         return response()->json($bonus);
     }
-
+    public function getType(Request $request)
+    {
+        $bonus = DB::table('bonus')->where('permanent','=',false)->get();
+        return response()->json($bonus);
+    }
     public function newBonus(Request $request)
     {
 

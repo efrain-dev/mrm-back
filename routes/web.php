@@ -24,16 +24,16 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->post('logout', 'LumenAuthController@logout');
     $router->post('refresh', 'LumenAuthController@refresh');
 });
-
-$router->group(['prefix' => 'api', 'middleware' => 'auth'], function () use ($router) {
-//$router->group(['prefix' => 'api'], function () use ($router) {
+//$router->group(['prefix' => 'api', 'middleware' => 'auth'], function () use ($router) {
+$router->group(['prefix' => 'api'], function () use ($router) {
     $router->group(['prefix' => 'bonus'], function () use ($router) {
-        $router->get('', 'Catalogos\WorkerController@index');
-        $router->post('/new-bonus', 'Catalogos\WorkerController@newBonus');
-        $router->post('/edit-bonus', 'Catalogos\WorkerController@editDetailBonus');
-        $router->post('/deactivate-bonus', 'Catalogos\WorkerController@deactivateBonus');
-        $router->post('/add-worker', 'Catalogos\WorkerController@addWorkers');
-        $router->post('/delete-worker', 'Catalogos\WorkerController@deleteWorker');
+        $router->get('/get/{type}', 'Catalogos\BonusController@index');
+        $router->get('/type', 'Catalogos\BonusController@getType');
+        $router->post('', 'Catalogos\BonusController@newBonus');
+        $router->post('/edit-bonus', 'Catalogos\BonusController@editDetailBonus');
+        $router->post('/deactivate-bonus', 'Catalogos\BonusController@deactivateBonus');
+        $router->post('/add-worker', 'Catalogos\BonusController@addWorkers');
+        $router->post('/delete-worker', 'Catalogos\BonusController@deleteWorker');
     });
     $router->group(['prefix' => 'worker'], function () use ($router) {
         $router->get('','Catalogos\WorkerController@index');
@@ -44,12 +44,14 @@ $router->group(['prefix' => 'api', 'middleware' => 'auth'], function () use ($ro
     });
     $router->group(['prefix' => 'payroll'], function () use ($router) {
         $router->get('','Catalogos\PayrollController@index');
-        $router->post('/new-payroll','Catalogos\PayrollController@newPayroll');
-        $router->get('/get/{id}','Catalogos\PayrollController@showPayroll');
+        $router->post('','Catalogos\PayrollController@newPayroll');
+        $router->get('/get','Catalogos\PayrollController@showPayroll');
     });
     $router->group(['prefix' => 'detail'], function () use ($router) {
-        $router->get('','Catalogos\DetailController@index');
-        $router->post('/new-detail','Catalogos\DetailController@newDetail');
-        $router->get('/get/{id}','Catalogos\DetailController@showPayroll');
+        $router->get('','Catalogos\DetailController@getReport');
+        $router->post('','Catalogos\DetailController@newDetail');
+        $router->get('/get','Catalogos\DetailController@getReport');
+        $router->delete('/{id}/delete','Catalogos\DetailController@deleteReport');
+
     });
 });

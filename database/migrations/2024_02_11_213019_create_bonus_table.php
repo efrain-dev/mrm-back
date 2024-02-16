@@ -17,6 +17,8 @@ class CreateBonusTable extends Migration
             $table->increments('id');
             $table->string('name');
             $table->string('type',1);
+            $table->boolean('permanent')->default(false);
+
         });
     }
 

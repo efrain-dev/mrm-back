@@ -34,14 +34,14 @@ class PayrollController extends Controller
 
         try {
             $this->validate($request, [
-                'id' => 'required',
+                'payroll' => 'required',
             ]);
             $data = $request->all();
-            $payroll = Payroll::find($data['id']);
+            $payroll = Payroll::find($data['payroll']);
             return response()->json([
                 'status' => 1,
                 'message' => 'Successfully payroll',
-                'payrall'=>$payroll
+                'payroll'=>$payroll
             ]);
         } catch (\Illuminate\Database\QueryException $e) {
             return response()->json([
@@ -63,8 +63,8 @@ class PayrollController extends Controller
                 'description' => 'required'
             ]);
             $data = $request->all();
-            $data['start'] = Carbon::parse($data['start']);
-            $data['end'] = Carbon::parse($data['end']);
+            $data['start'] =  Carbon::createFromFormat('d/m/Y', $data['start']);
+            $data['end'] =  Carbon::createFromFormat('d/m/Y', $data['end']);
             $data['users_id'] = $request->user()->id;
             Payroll::create($data);
             return response()->json([
