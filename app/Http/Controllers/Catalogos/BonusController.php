@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Catalogos;
 use App\Http\Controllers\Controller;
 use App\Models\Bonus;
 use App\Models\BonusDetail;
+use App\Models\PayrollBonus;
 use App\Models\Worker;
 use App\Models\WorkerBonus;
 use Exception;
@@ -24,11 +25,25 @@ class BonusController extends Controller
         $bonus = $query->get();
         return response()->json($bonus);
     }
+    public function getBonus(Request $request)
+    {
+        $this->validate($request, [
+            'payroll' => 'required',
+            'worker' => 'required',
+        ]);
+
+        $query = DB::table('bonus_payroll')
+            ->join('detail_bonus','detail_bonus.id','=','bonus_payroll.id_detail_bonus')
+            ->join('bonus','bonus.id','=','detail_bonus.id_bonus')
+            ->select('detail_bonus.amount','detail_bonus.date','bonus_payroll.id','bonus.name as bonus')->get();
+        return response()->json($query);
+    }
     public function getType(Request $request)
     {
         $bonus = DB::table('bonus')->where('permanent','=',false)->get();
         return response()->json($bonus);
     }
+
     public function newBonus(Request $request)
     {
 
@@ -58,13 +73,22 @@ class BonusController extends Controller
         try {
             $this->validate($request, [
                 'amount' => 'required',
-                'calc' => 'required',
-                'general' => 'required',
-                'active' => 'required',
-                'id_bonus' => 'required',
+                'bonus' => 'required',
+                'payroll' => 'required',
+                'date'=>'required',
+                'worker'=>'required',
+
             ]);
             $data = $request->all();
-            BonusDetail::create($data);
+            $bonus = BonusDetail::create(
+                [
+                    'amount'=>$data['amount'],
+                    'id_bonus'=>$data['bonus'],
+                    'calc'=>1,
+                    'date'=>Carbon::createFromFormat('d/m/Y', $data['date']),
+                ]);
+            PayrollBonus::create(['id_detail_bonus'=>$bonus->id,'id_payroll'=>$data['payroll'],'id_worker'=>$data['worker']]);
+
             return response()->json([
                 'status' => 1,
                 'message' => 'Successfully created bonus'
@@ -78,44 +102,40 @@ class BonusController extends Controller
 
     }
 
-    public function editDetailBonus(Request $request)
-    {
-        $this->validate($request, [
-            'amount' => 'required',
-            'calc' => 'required',
-            'general' => 'required',
-            'active' => 'required',
-            'id_bonus' => 'required',
-            'id_detail' => 'required',
-        ]);
-        $data = $request->all();
-        try {
-            $message = DB::transaction(function () use ($data) {
-                BonusDetail::find($data['id_detail'])->update(['active' => false]);
-                unset($data['id_detail']);
-                BonusDetail::create($data);
-                return [
-                    'status' => 1,
-                    'message' => 'Successfully updated bonus'
-                ];
-            });
-        } catch (Exception $e) {
-            $message = ['status' => 'error', 'message' => $e->getMessage(), 500];
-        }
-        return response()->json($message);
-    }
+//    public function editDetailBonus(Request $request)
+//    {
+//        $this->validate($request, [
+//            'amount' => 'required',
+//            'calc' => 'required',
+//            'general' => 'required',
+//            'active' => 'required',
+//            'id_bonus' => 'required',
+//            'id_detail' => 'required',
+//        ]);
+//        $data = $request->all();
+//        try {
+//            $message = DB::transaction(function () use ($data) {
+//                BonusDetail::find($data['id_detail'])->update(['active' => false]);
+//                unset($data['id_detail']);
+//                BonusDetail::create($data);
+//                return [
+//                    'status' => 1,
+//                    'message' => 'Successfully updated bonus'
+//                ];
+//            });
+//        } catch (Exception $e) {
+//            $message = ['status' => 'error', 'message' => $e->getMessage(), 500];
+//        }
+//        return response()->json($message);
+//    }
 
-    public function deactivateBonus(Request $request)
+    public function deleteBonus(Request $request,$id)
     {
         try {
-            $this->validate($request, [
-                'id_detail' => 'required',
-            ]);
-            $data = $request->all();
-            BonusDetail::find($data['id_detail'])->update(['active' => false]);
+            BonusDetail::find($id)->delete();
             return response()->json([
                 'status' => 1,
-                'message' => 'Successfully updated bonus'
+                'message' => 'Successfully deleted bonus'
             ]);
         } catch (\Illuminate\Database\QueryException $e) {
             return response()->json([
@@ -125,54 +145,4 @@ class BonusController extends Controller
         }
 
     }
-
-    public function addWorkers(Request $request)
-    {
-        $this->validate($request, [
-            'id_bonus' => 'required',
-            'workers' => 'required'
-        ]);
-        $data = $request->all();
-        try {
-            $message = DB::transaction(function () use ($data) {
-                foreach ($data['workers'] as $item){
-                    WorkerBonus::create([
-                        'id_bonus'=>$data['id_bonus'],
-                        'id_worker'=>$item,
-                    ]);
-                }
-                return [
-                    'status' => 1,
-                    'message' => 'Employees successfully added'
-                ];
-            });
-        } catch (Exception $e) {
-            $message = ['status' => 'error', 'message' => $e->getMessage(), 500];
-        }
-        return response()->json($message);
-
-    }
-    public function deleteWorker(Request $request)
-    {
-        $this->validate($request, [
-            'bonus' => 'required'
-        ]);
-        $data = $request->get('bonus');
-        try {
-            $message = DB::transaction(function () use ($data) {
-                foreach ($data as $item){
-                    WorkerBonus::find($item)->delete();
-                }
-                return [
-                    'status' => 1,
-                    'message' => 'Employees deleted'
-                ];
-            });
-        } catch (Exception $e) {
-            $message = ['status' => 'error', 'message' => $e->getMessage(), 500];
-        }
-        return response()->json($message);
-
-    }
-
 }

@@ -37,6 +37,16 @@ class PayrollController extends Controller
                 'payroll' => 'required',
             ]);
             $data = $request->all();
+
+            $payroll = Payroll::find($data['payroll']);
+            $empleados = DB::table('report') ->where('id_payroll','=',$data['payroll'])
+                ->select('worker.name','worker.last_name','worker.salary','worker.rate_night','worker.id as id_worker')
+                ->join('worker','worker.id','=','report.id_worker') ->groupBy('id_worker')->get();
+            $empleados->map(function ($item) use($payroll) {
+               $reports = DB::table('report') ->selectRaw('sum(regular) as regular, sum(extra) as extra, sum(night) as night') ->where('id_payroll','=',$payroll->id)->where('report.id_worker',$item->id_worker)->get();
+               dd($item);
+            });
+
             $payroll = Payroll::find($data['payroll']);
             return response()->json([
                 'status' => 1,
@@ -79,5 +89,6 @@ class PayrollController extends Controller
         }
 
     }
+
 
 }

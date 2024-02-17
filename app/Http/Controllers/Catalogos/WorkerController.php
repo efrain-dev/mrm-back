@@ -119,6 +119,8 @@ class WorkerController extends Controller
                 'email' => 'nullable|email',
                 'address' => 'nullable',
                 'contact' => 'nullable',
+                'cel' => 'nullable',
+
             ]);
 
             $data = $request->all();

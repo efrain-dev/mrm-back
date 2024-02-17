@@ -28,12 +28,11 @@ $router->group(['prefix' => 'api'], function () use ($router) {
 $router->group(['prefix' => 'api'], function () use ($router) {
     $router->group(['prefix' => 'bonus'], function () use ($router) {
         $router->get('/get/{type}', 'Catalogos\BonusController@index');
+        $router->get('/get-bonus', 'Catalogos\BonusController@getBonus');
         $router->get('/type', 'Catalogos\BonusController@getType');
         $router->post('', 'Catalogos\BonusController@newBonus');
-        $router->post('/edit-bonus', 'Catalogos\BonusController@editDetailBonus');
-        $router->post('/deactivate-bonus', 'Catalogos\BonusController@deactivateBonus');
-        $router->post('/add-worker', 'Catalogos\BonusController@addWorkers');
-        $router->post('/delete-worker', 'Catalogos\BonusController@deleteWorker');
+        $router->delete('/{id}/delete', 'Catalogos\BonusController@deleteBonus');
+
     });
     $router->group(['prefix' => 'worker'], function () use ($router) {
         $router->get('','Catalogos\WorkerController@index');
@@ -54,4 +53,6 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         $router->delete('/{id}/delete','Catalogos\DetailController@deleteReport');
 
     });
+
+
 });

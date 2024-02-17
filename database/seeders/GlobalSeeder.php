@@ -19,16 +19,36 @@ class GlobalSeeder extends Seeder
                 ['name' => 'Night hours','type'=>'D','permanent'=>true],
                 ['name' => 'Overtime Hours','type'=>'D','permanent'=>true],
                 ['name' => 'Overtime night','type'=>'D','permanent'=>true],
+            ]
+        );
+        DB::table('detail_bonus')->insert([
+                ['id_bonus' => 1, 'calc'=>2,'amount'=>'4','date'=>'15/01/2000'],
+                ['id_bonus' => 2, 'calc'=>2,'amount'=>'25','date'=>'15/01/2000'],
+                ['id_bonus' => 3, 'calc'=>2,'amount'=>'50','date'=>'15/01/2000'],
+                ['id_bonus' => 4, 'calc'=>2,'amount'=>'50','date'=>'15/01/2000'],
+
+            ]
+        );
+        DB::table('bonus')->insert([
+
+                ['name' => 'Descuento','type'=>'D','permanent'=>false],
+                ['name' => 'Bonificacion','type'=>'B','permanent'=>false],
 
             ]
         );
         DB::table('detail_bonus')->insert([
-                ['id_bonus' => 1, 'calc'=>2,'amount'=>'4'],
-                ['id_bonus' => 2, 'calc'=>2,'amount'=>'25'],
-                ['id_bonus' => 3, 'calc'=>2,'amount'=>'50'],
+                ['id_bonus' => 5, 'calc'=>1,'amount'=>'100','date'=>'15/01/2000'],
+                ['id_bonus' => 6, 'calc'=>1,'amount'=>'50','date'=>'15/01/2000'],
+
             ]
         );
 
+        DB::table('bonus_payroll')->insert([
+                ['id_detail_bonus' => 5, 'id_payroll'=>1,'id_worker'=>1],
+                ['id_detail_bonus' => 6, 'id_payroll'=>1,'id_worker'=>1],
+
+            ]
+        );
         DB::table('payroll')->insert([
                 [ 'start'=>'01/01/2000','end'=>'15/01/2000','type'=>'D','users_id'=>1,'description'=>"Descripcion de planilla"],
                 [ 'start'=>'16/01/2000','end'=>'31/01/2000','type'=>'D','users_id'=>1,'description'=>"Descripcion de planilla"],
@@ -37,9 +57,26 @@ class GlobalSeeder extends Seeder
 
         DB::table('worker')->insert([
                 [ 'date_in'=>'01/01/2000','date_out'=>'15/01/2000','birthdate'=>'15/01/2000','name'=>'Roberto','last_name'=>'Carlos','salary'=>10,'social_number'=>38437434873483
-                    , 'rate_night'=>15,'email'=>"correo@gmail.com","address"=>"Direccion",'contact'=>'Contacto'],
+                    , 'rate_night'=>15,'email'=>"correo@gmail.com","address"=>"Direccion",'contact'=>'Contacto','cel'=>565633543],
                 [ 'date_in'=>'01/01/2000','date_out'=>'15/01/2000','birthdate'=>'15/01/2000','name'=>'Marco','last_name'=>'Polo','salary'=>10,'social_number'=>38437434873483
-                    , 'rate_night'=>15,'email'=>"correo2@gmail.com","address"=>"Direccion",'contact'=>'Contacto']
+                    , 'rate_night'=>15,'email'=>"correo2@gmail.com","address"=>"Direccion",'contact'=>'Contacto','cel'=>565633543]
+            ]
+        );
+
+        DB::table('payroll')->insert([
+                ['type'=>'1','start'=>'15/01/2000','end'=>'15/01/2000','description'=>"Descripcion",'users_id'=>1],
+                ['type'=>'2','start'=>'15/01/2000','end'=>'15/01/2000','description'=>"Descripcion",'users_id'=>1],
+            ]
+        );
+        DB::table('report')->insert([
+                [ 'regular'=>'8','extra'=>'4','night'=>'0','start'=>'15/01/2000','end'=>'15/01/2000','id_payroll'=>1,'id_worker'=>1],
+                [ 'regular'=>'8','extra'=>'4','night'=>'0','start'=>'15/01/2000','end'=>'15/01/2000','id_payroll'=>1,'id_worker'=>2],
+                [ 'regular'=>'6','extra'=>'4','night'=>'0','start'=>'15/01/2000','end'=>'15/01/2000','id_payroll'=>1,'id_worker'=>1],
+                [ 'regular'=>'8','extra'=>'4','night'=>'0','start'=>'15/01/2000','end'=>'15/01/2000','id_payroll'=>1,'id_worker'=>2],
+                [ 'regular'=>'8','extra'=>'4','night'=>'2','start'=>'15/01/2000','end'=>'15/01/2000','id_payroll'=>2,'id_worker'=>1],
+                [ 'regular'=>'8','extra'=>'4','night'=>'4','start'=>'15/01/2000','end'=>'15/01/2000','id_payroll'=>2,'id_worker'=>2],
+                [ 'regular'=>'6','extra'=>'4','night'=>'2','start'=>'15/01/2000','end'=>'15/01/2000','id_payroll'=>2,'id_worker'=>1],
+                [ 'regular'=>'8','extra'=>'4','night'=>'3','start'=>'15/01/2000','end'=>'15/01/2000','id_payroll'=>2,'id_worker'=>2],
             ]
         );
     }

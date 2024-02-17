@@ -19,11 +19,12 @@ return new class extends Migration
             $table->date('date_in');
             $table->date('date_out')->nullable();
             $table->date('birthdate');
-            $table->string('social_number');
+            $table->string('social_number')->nullable();
             $table->string('rate_night');
             $table->string('email')->unique();
-            $table->string('address');
-            $table->string('contact');
+            $table->string('address')->nullable();
+            $table->string('contact')->nullable();
+            $table->string('cel')->nullable();
             $table->boolean('active')->default(true);
 
             $table->timestamps();

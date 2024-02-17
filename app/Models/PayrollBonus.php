@@ -5,11 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class WorkerBonus extends Model
+class PayrollBonus extends Model
 {
     use HasFactory;
     protected $guarded = ['id'];
-    protected $table = "worker_bonus";
+    protected $table = "bonus_payroll";
     protected $primaryKey = 'id';
     public $timestamps = false;
 }
