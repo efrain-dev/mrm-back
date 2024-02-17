@@ -50,8 +50,8 @@ class GlobalSeeder extends Seeder
             ]
         );
         DB::table('payroll')->insert([
-                [ 'start'=>'01/01/2000','end'=>'15/01/2000','type'=>'D','users_id'=>1,'description'=>"Descripcion de planilla"],
-                [ 'start'=>'16/01/2000','end'=>'31/01/2000','type'=>'D','users_id'=>1,'description'=>"Descripcion de planilla"],
+                [ 'start'=>'01/01/2024','end'=>'15/01/2024','type'=>'D','users_id'=>1,'description'=>"Descripcion de planilla dia"],
+                [ 'start'=>'16/01/2024','end'=>'31/01/2024','type'=>'N','users_id'=>1,'description'=>"Descripcion de planilla noche"],
             ]
         );
         $global = DB::table('bonus')->join('detail_bonus', 'detail_bonus.id_bonus', '=', 'bonus.id')->where('permanent', '=', true)
@@ -69,20 +69,19 @@ class GlobalSeeder extends Seeder
             ]
         );
 
-        DB::table('payroll')->insert([
-                ['type'=>'1','start'=>'15/01/2000','end'=>'15/01/2000','description'=>"Descripcion",'users_id'=>1],
-                ['type'=>'2','start'=>'15/01/2000','end'=>'15/01/2000','description'=>"Descripcion",'users_id'=>1],
-            ]
-        );
+
         DB::table('report')->insert([
-                [ 'regular'=>'8','extra'=>'4','night'=>'0','start'=>'15/01/2000','end'=>'15/01/2000','id_payroll'=>1,'id_worker'=>1],
-                [ 'regular'=>'8','extra'=>'4','night'=>'0','start'=>'15/01/2000','end'=>'15/01/2000','id_payroll'=>1,'id_worker'=>2],
-                [ 'regular'=>'6','extra'=>'4','night'=>'0','start'=>'15/01/2000','end'=>'15/01/2000','id_payroll'=>1,'id_worker'=>1],
-                [ 'regular'=>'8','extra'=>'4','night'=>'0','start'=>'15/01/2000','end'=>'15/01/2000','id_payroll'=>1,'id_worker'=>2],
-                [ 'regular'=>'8','extra'=>'4','night'=>'2','start'=>'15/01/2000','end'=>'15/01/2000','id_payroll'=>2,'id_worker'=>1],
-                [ 'regular'=>'8','extra'=>'4','night'=>'4','start'=>'15/01/2000','end'=>'15/01/2000','id_payroll'=>2,'id_worker'=>2],
-                [ 'regular'=>'6','extra'=>'4','night'=>'2','start'=>'15/01/2000','end'=>'15/01/2000','id_payroll'=>2,'id_worker'=>1],
-                [ 'regular'=>'8','extra'=>'4','night'=>'3','start'=>'15/01/2000','end'=>'15/01/2000','id_payroll'=>2,'id_worker'=>2],
+                [ 'regular'=>'8','extra'=>'4','night'=>'4','overtime_night'=>'0','start'=>'15/01/2000','end'=>'15/01/2000','id_payroll'=>1,'id_worker'=>1],
+                [ 'regular'=>'6','extra'=>'4','night'=>'4','overtime_night'=>'0','start'=>'15/01/2000','end'=>'15/01/2000','id_payroll'=>1,'id_worker'=>1],
+                [ 'regular'=>'2','extra'=>'4','night'=>'4','overtime_night'=>'0','start'=>'15/01/2000','end'=>'15/01/2000','id_payroll'=>1,'id_worker'=>1],
+
+                [ 'regular'=>'8','extra'=>'4','night'=>'0','overtime_night'=>'0','start'=>'15/01/2000','end'=>'15/01/2000','id_payroll'=>1,'id_worker'=>2],
+                [ 'regular'=>'6','extra'=>'4','night'=>'0','overtime_night'=>'0','start'=>'15/01/2000','end'=>'15/01/2000','id_payroll'=>1,'id_worker'=>1],
+                [ 'regular'=>'8','extra'=>'4','night'=>'0','overtime_night'=>'0','start'=>'15/01/2000','end'=>'15/01/2000','id_payroll'=>1,'id_worker'=>2],
+                [ 'regular'=>'8','extra'=>'4','night'=>'2','overtime_night'=>'4','start'=>'15/01/2000','end'=>'15/01/2000','id_payroll'=>2,'id_worker'=>1],
+                [ 'regular'=>'8','extra'=>'4','night'=>'4','overtime_night'=>'1','start'=>'15/01/2000','end'=>'15/01/2000','id_payroll'=>2,'id_worker'=>2],
+                [ 'regular'=>'6','extra'=>'4','night'=>'2','overtime_night'=>'3','start'=>'15/01/2000','end'=>'15/01/2000','id_payroll'=>2,'id_worker'=>1],
+                [ 'regular'=>'8','extra'=>'4','night'=>'3','overtime_night'=>'2','start'=>'15/01/2000','end'=>'15/01/2000','id_payroll'=>2,'id_worker'=>2],
             ]
         );
     }

@@ -44,6 +44,8 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     });
     $router->group(['prefix' => 'payroll'], function () use ($router) {
         $router->get('','Catalogos\PayrollController@index');
+        $router->get('/total','Catalogos\PayrollController@getPayrollsApi');
+
         $router->post('','Catalogos\PayrollController@newPayroll');
         $router->get('/get','Catalogos\PayrollController@showPayroll');
     });
@@ -54,6 +56,10 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         $router->delete('/{id}/delete','Catalogos\DetailController@deleteReport');
 
     });
+    $router->group(['prefix' => 'report'], function () use ($router) {
+        $router->get('/payroll','Catalogos\PayrollController@getPayrollsApi');
+        $router->get('/worker','Catalogos\PayrollController@getWorkerApi');
 
+    });
 
 });

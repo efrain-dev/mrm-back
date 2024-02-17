@@ -19,14 +19,93 @@ class PayrollController extends Controller
     {
 
         $payroll = DB::table('payroll')->get();
-//        $bonus->map(function ($data) {
-//            $detail = DB::table('detail_bonus')->where('id_bonus', '=', $data->id)->where('active', '=', 1)->first();
-//            $data->id_detail = $detail->id;
-//            $data->calc = $detail->calc;
-//            $data->amount = $detail->amount;
-//        });
-
         return response()->json($payroll);
+    }
+
+    public function getPayrollsApi(Request $request)
+    {
+        [$from, $to] = $this->getDates($request);
+        [$payroll, $from, $to, $net_pay, $ncdor, $total, $gross_pay, $desc, $bon] = $this->getPayrolls($from, $to);
+        return response()->json(['payrolls' => $payroll, "from" => "$from", "to" => "$to", "net_pay" => $net_pay, "ncdor" => $ncdor, "total" => $total, "gross_pay" => $gross_pay, "desc" => $desc, "bon" => $bon]);
+    }
+
+    public function getWorkerApi(Request $request)
+    {
+
+        [$from, $to] = $this->getDates($request);
+        $this->validate($request, [
+            'worker' => 'required',
+        ]);
+        $worker = $request->get('worker');
+        [$payroll, $from, $to, $net_pay, $ncdor, $total, $gross_pay, $desc, $bon,$worker] = $this->getPayrollsWorker($from, $to, $worker);
+        return response()->json(['payrolls' => $payroll,'worker'=>$worker, "from" => "$from", "to" => "$to", "net_pay" => $net_pay, "ncdor" => $ncdor, "total" => $total, 'gross_pay' => $gross_pay, "desc" => $desc, "bon" => $bon]);
+    }
+
+
+    public function getPayrolls($from, $to)
+    {
+        $payroll = DB::table('payroll as p')
+            ->whereBetween('p.end', ["$to", "$from"])
+            ->get();
+        $payroll->map(function ($item) {
+            [$payroll,] = $this->calcPayroll($item);
+            $item->desc = $payroll->desc;
+            $item->bon = $payroll->bon;
+            $item->net_pay = $payroll->net_pay;
+            $item->ncdor = $payroll->ncdor;
+            $item->total = $payroll->total;
+            $item->gross_pay = $payroll->gross_pay;
+        });
+        $desc = $payroll->sum('desc');
+        $bon = $payroll->sum('bon');
+        $net_pay = $payroll->sum('net_pay');
+        $ncdor = $payroll->sum('ncdor');
+        $total = $payroll->sum('total');
+        $gross_pay = $payroll->sum('gross_pay');
+        return ([$payroll, "$from", "$to", $net_pay, $ncdor, $total, $gross_pay, $desc, $bon]);
+
+    }
+
+    public function getPayrollsWorker($from, $to, $id)
+    {
+        $payroll = DB::table('report as r')->join('payroll as p', 'p.id', '=', 'r.id_payroll')
+            ->select('p.*')
+            ->where('r.id_worker', $id)
+            ->whereBetween('p.end', ["$to", "$from"])->groupBy('p.id')
+            ->get();
+        $worker = DB::table('worker as w')
+            ->where('w.id', $id)
+            ->select('w.name', 'w.last_name', 'w.salary as rate', 'w.rate_night', 'w.id as id_worker')->first();
+        $payroll->map(function ($item) use ($worker) {
+            [$detail_bonus, $reports, $total_hours, $regular_hours, $extra_hours, $night_hours, $overtime_night_hours
+                , $period_regular, $night, $overtime_regular, $overtime_night, $bon, $desc, $net_pay, $ncdor
+                , $subtotal, $gross_pay] =
+                $this->calcEmpleado($item->id, $item->type, $worker);
+            $item->net_pay = $net_pay;
+            $item->ncdor = $ncdor;
+            $item->total = $subtotal;
+            $item->gross_pay = $gross_pay;
+            $item->total = $subtotal;
+            $item->desc = $desc;
+            $item->bon = $bon;
+
+        });
+        $net_pay = $payroll->sum('net_pay');
+        $ncdor = $payroll->sum('ncdor');
+        $total = $payroll->sum('total');
+        $gross_pay = $payroll->sum('gross_pay');
+        $desc = $payroll->sum('desc');
+        $bon = $payroll->sum('bon');
+        return ([$payroll, "$from", "$to", $net_pay, $ncdor, $total, $gross_pay,$desc,$bon,$worker]);
+    }
+
+    public function getDates($request)
+    {
+        $from = $request->get('from');
+        $to = $request->get('to');
+        $from = $from ? Carbon::createFromFormat('d/m/Y', $from) : Carbon::now()->startOfYear()->subDays(1)->format('d/m/Y');
+        $to = $to ? Carbon::createFromFormat('d/m/Y', $to)->addDay() : Carbon::now()->addMonth()->startOfMonth()->format('d/m/Y');
+        return [$from, $to];
     }
 
     public function showPayroll(Request $request)
@@ -37,7 +116,7 @@ class PayrollController extends Controller
             ]);
             $data = $request->all();
             $pay = Payroll::find($data['payroll']);
-            [$payroll,$empleados] = $this->calcPayroll($pay);
+            [$payroll, $empleados] = $this->calcPayroll($pay);
             return response()->json([
                 'status' => 1,
                 'message' => 'Successfully payroll',
@@ -53,79 +132,111 @@ class PayrollController extends Controller
         }
 
     }
-    private function calcPayroll($payroll){
-        $empleados = DB::table('report')->where('id_payroll', '=',  $payroll->id)
+
+    private function calcPayroll($payroll)
+    {
+        $empleados = DB::table('report')->where('id_payroll', '=', $payroll->id)
             ->select('worker.name', 'worker.last_name', 'worker.salary as rate', 'worker.rate_night', 'worker.id as id_worker')
             ->join('worker', 'worker.id', '=', 'report.id_worker')->groupBy('id_worker')->get();
-        $bonusPer = $this->getBonPermament($payroll->id);
-        $payroll->net_pay= 0;
-        $payroll->ncdor= 0;
-        $payroll->total= 0;
-        $empleados = $this->mapEmpleado($empleados,$payroll,$bonusPer);
-        return [$payroll,$empleados];
-    }
-    private function mapEmpleado($empleados,$payroll,$bonusPer){
-        $empleados->map(function ($item) use ($payroll, $bonusPer) {
+        $payroll->net_pay = 0;
+        $payroll->ncdor = 0;
+        $payroll->total = 0;
+        $payroll->desc = 0;
+        $payroll->bon = 0;
+        $payroll->gross_pay = 0;
 
-            [$total_hours,$regular_hours,$extra_hours,$night_hours,$period,$night,$overtime,$bon,$desc,$net_pay,$ncdor,$total,$gross_pay]=  $this->calcEmpleado($payroll->id,$bonusPer,$item);
-            $item->total_hours =$total_hours;
+        $empleados = $this->mapEmpleado($empleados, $payroll);
+        return [$payroll, $empleados];
+    }
+
+    private function mapEmpleado($empleados, $payroll)
+    {
+        $empleados->map(function ($item) use ($payroll) {
+            [$detail_bonus, $reports, $total_hours, $regular_hours, $extra_hours, $night_hours, $overtime_night_hours, $period_regular, $night, $overtime_regular, $overtime_night, $bon, $desc, $net_pay, $ncdor, $subtotal, $gross_pay] = $this->calcEmpleado($payroll->id, $payroll->type, $item);
+            $item->total_hours = $total_hours;
             $item->regular_hours = $regular_hours;
-            $item->extra_hours =$extra_hours;
+            $item->extra_hours = $extra_hours;
             $item->night_hours = $night_hours;
+            $item->overtime_night_hours = $overtime_night_hours;
             $item->bonifications = $bon;
             $item->extra_deductions = $desc;
-            $item->period=  $period;
+            $item->period_regular = $period_regular;
             $item->total_night = $night;
-            $item->total_overtime = $overtime;
+            $item->total_overtime_regular = $overtime_regular;
+            $item->total_overtime_night = $overtime_night;
             $item->net_pay = $net_pay;
-            $payroll->net_pay +=$item->net_pay;
-            $payroll->ncdor +=$ncdor;
-            $payroll->total +=$total;
-            $item->total =   $total;
-            $item->gross_pay =   $gross_pay;
+            $item->ncdor = $ncdor;
+            $payroll->net_pay += $item->net_pay;
+            $payroll->bon += $bon;
+            $payroll->desc += $desc;
+            $payroll->net_pay += $item->net_pay;
+            $payroll->ncdor += $ncdor;
+            $payroll->total += $subtotal;
+            $payroll->gross_pay += $gross_pay;
+            $item->subtotal = $subtotal;
+            $item->gross_pay = $gross_pay;
+            $item->detail_bonus = $detail_bonus;
+            $item->reports = $reports;
+
         });
+
         return $empleados;
     }
-    private function calcEmpleado($payroll,$bonusPer,$item){
-        $reports = DB::table('report')->selectRaw('sum(regular) as regular, sum(extra) as extra, sum(night) as night')->where('id_payroll', '=', $payroll)->where('report.id_worker', $item->id_worker)->first();
-        $total_hours = $reports->regular + $reports->extra + $reports->night;
-        $regular_hours = $reports->regular;
-        $extra_hours = $reports->extra;
-        $night_hours = $reports->night;
-        [$bon, $desc] = $this->getBon($payroll, $item->id_worker);
-        $period=  $item->rate *$total_hours;
-        $night=  (($item->rate * ($bonusPer->firstWhere('name','=','Night hours')->amount/100)) + $item->rate)*$night_hours;
-        $overtime=  (($item->rate * ($bonusPer->firstWhere('name','=','Overtime Hours')->amount/100)) + $item->rate)*$extra_hours;
-        $net_pay = $period+$night+$overtime;
-        $total =$net_pay+$bon-$desc;
-        $ncdor = $net_pay* ($bonusPer->firstWhere('name','=','NCDOR')->amount/100);
-        $gross_pay =   $total- $ncdor;
-        return [$total_hours,$regular_hours,$extra_hours,$night_hours,$period,$night,$overtime,$bon,$desc,$net_pay,$ncdor,$total,$gross_pay];
+
+    private function calcEmpleado($payroll, $type, $item)
+    {
+
+        $bonusPer = $this->getBonPermament($payroll);
+        $reports = DB::table('report as r')->where('r.id_payroll', '=', $payroll)->where('r.id_worker', $item->id_worker)->select('r.*')->get();
+        $regular_hours = $reports->sum('regular');
+        $extra_hours = $reports->sum('extra');
+        $night_hours = $reports->sum('night');
+        if ($type == 'D') {
+            $overtime_night = 0;
+            $overtime_night_hours = 0;
+            $night = (($item->rate * ($bonusPer->firstWhere('name', '=', 'Night hours')->amount / 100)) + $item->rate) * $night_hours;
+        } else {
+            $overtime_night_hours = $reports->sum('overtime_night');
+            $overtime_night = (($item->rate_night * ($bonusPer->firstWhere('name', '=', 'Overtime night')->amount / 100)) + $item->rate_night) * $overtime_night_hours;
+            $night = (($item->rate_night * ($bonusPer->firstWhere('name', '=', 'Night hours')->amount / 100)) + $item->rate_night) * $night_hours;
+        }
+        $total_hours = $regular_hours + $extra_hours + $night_hours + $overtime_night_hours;
+        [$bon, $desc, $detail_bonus] = $this->getBon($payroll, $item->id_worker);
+        $period_regular = $item->rate * $total_hours;
+        $overtime_regular = (($item->rate * ($bonusPer->firstWhere('name', '=', 'Overtime Hours')->amount / 100)) + $item->rate) * $extra_hours;
+        $net_pay = $period_regular + $night + $overtime_regular + $overtime_night;
+        $subtotal = $net_pay + $bon;
+        $ncdor = $net_pay * ($bonusPer->firstWhere('name', '=', 'NCDOR')->amount / 100);
+        $gross_pay = $subtotal - $ncdor - $desc;
+        return [$detail_bonus, $reports, $total_hours, $regular_hours, $extra_hours, $night_hours, $overtime_night_hours, $period_regular, $night, $overtime_regular, $overtime_night, $bon, $desc, $net_pay, $ncdor, $subtotal, $gross_pay];
     }
+
     private function getBon($payroll, $worker)
     {
         $bonus = DB::table('bonus_payroll')->join('detail_bonus', 'detail_bonus.id', '=', 'bonus_payroll.id_detail_bonus')
             ->join('bonus', 'bonus.id', '=', 'detail_bonus.id_bonus')
-            ->where('bonus_payroll.id_payroll','=',$payroll)
-            ->where('bonus_payroll.id_worker','=',$worker)
-            ->select('detail_bonus.*','bonus.type')
+            ->where('bonus_payroll.id_payroll', '=', $payroll)
+            ->where('bonus_payroll.id_worker', '=', $worker)
+            ->select('detail_bonus.*', 'bonus.type', 'bonus.name')
             ->get();
-        $bon = $bonus->where('type','=','B')->sum('amount');
-        $des = $bonus->where('type','=','D')->sum('amount');
-        return [$bon, $des];
+        $bon = $bonus->where('type', '=', 'B')->sum('amount');
+        $des = $bonus->where('type', '=', 'D')->sum('amount');
+        return [$bon, $des, $bonus];
 
     }
+
     private function getBonPermament($payroll)
     {
-       return DB::table('bonus_payroll')->join('detail_bonus', 'detail_bonus.id', '=', 'bonus_payroll.id_detail_bonus')
+        return DB::table('bonus_payroll')->join('detail_bonus', 'detail_bonus.id', '=', 'bonus_payroll.id_detail_bonus')
             ->join('bonus', 'bonus.id', '=', 'detail_bonus.id_bonus')
-            ->where('bonus_payroll.id_payroll','=',$payroll)
-            ->where('permanent', '=', true)->where('active','=',1)
-            ->select('detail_bonus.*','bonus.type','bonus.name')
+            ->where('bonus_payroll.id_payroll', '=', $payroll)
+            ->where('permanent', '=', true)->where('active', '=', 1)
+            ->select('detail_bonus.*', 'bonus.type', 'bonus.name')
             ->get();
 
 
     }
+
     public function newPayroll(Request $request)
     {
 
@@ -143,8 +254,8 @@ class PayrollController extends Controller
             $payroll = Payroll::create($data);
             $global = DB::table('bonus')->join('detail_bonus', 'detail_bonus.id_bonus', '=', 'bonus.id')->where('permanent', '=', true)
                 ->where('active', '=', 1)->select('detail_bonus.id as id')->get();
-            foreach ($global as $item){
-                DB::table('bonus_payroll')->insert(['id_detail_bonus' => $item->id, 'id_payroll'=>$payroll->id,'id_worker'=>null]);
+            foreach ($global as $item) {
+                DB::table('bonus_payroll')->insert(['id_detail_bonus' => $item->id, 'id_payroll' => $payroll->id, 'id_worker' => null]);
 
             }
             return response()->json([

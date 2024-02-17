@@ -15,8 +15,8 @@ class CreatePayrollTable extends Migration
     {
         Schema::create('payroll', function (Blueprint $table) {
             $table->increments('id');
-            $table->dateTime('start');
-            $table->dateTime('end');
+            $table->date('start');
+            $table->date('end');
             $table->string('description');
             $table->string('type',1)->comment('Lo tipos se difine de d de day y n de nightly');
             $table->integer('users_id')->unsigned();

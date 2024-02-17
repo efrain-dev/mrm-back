@@ -25,8 +25,10 @@ class DetailController extends Controller
         ]);
         $data = $request->all();
         $worker = $data['worker']?:null;
-        $query = DB::table('report as r')->where(  'r.id_payroll','=',$data['payroll'])
-            ->select('r.*');
+        $query = DB::table('report as r')
+            ->join('worker', 'worker.id', '=', 'r.id_worker')
+            ->where(  'r.id_payroll','=',$data['payroll'])
+            ->select('r.*','worker.name','worker.last_name');
         if ($worker){
             $query =   $query->where('id_worker','=', $worker);
         }
@@ -40,6 +42,7 @@ class DetailController extends Controller
                 'regular' => 'required|numeric',
                 'extra' => 'required|numeric',
                 'night' => 'required|numeric',
+                'overtime_night' => 'required|numeric',
                 'start' => 'required',
                 'end' => 'required',
                 'id_payroll' => 'required',
