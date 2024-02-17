@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class GlobalSeeder extends Seeder
@@ -50,8 +51,8 @@ class GlobalSeeder extends Seeder
             ]
         );
         DB::table('payroll')->insert([
-                [ 'start'=>'01/01/2024','end'=>'15/01/2024','type'=>'D','users_id'=>1,'description'=>"Descripcion de planilla dia"],
-                [ 'start'=>'16/01/2024','end'=>'31/01/2024','type'=>'N','users_id'=>1,'description'=>"Descripcion de planilla noche"],
+                [ 'start'=>  Carbon::createFromFormat('d/m/Y', '01/01/2024') ,'end'=> Carbon::createFromFormat('d/m/Y', '15/01/2024') ,'type'=>'D','users_id'=>1,'description'=>"Descripcion de planilla dia"],
+                [ 'start'=> Carbon::createFromFormat('d/m/Y', '16/01/2024'),'end'=>Carbon::createFromFormat('d/m/Y', '31/01/2024'),'type'=>'N','users_id'=>1,'description'=>"Descripcion de planilla noche"],
             ]
         );
         $global = DB::table('bonus')->join('detail_bonus', 'detail_bonus.id_bonus', '=', 'bonus.id')->where('permanent', '=', true)
@@ -62,7 +63,7 @@ class GlobalSeeder extends Seeder
         }
 
         DB::table('worker')->insert([
-                [ 'date_in'=>'01/01/2000','date_out'=>'15/01/2000','birthdate'=>'15/01/2000','name'=>'Roberto','last_name'=>'Carlos','salary'=>10,'social_number'=>38437434873483
+                [ 'date_in'=>'01/01/2000','date_out'=>'  15/01/2000','birthdate'=>'15/01/2000','name'=>'Roberto','last_name'=>'Carlos','salary'=>10,'social_number'=>38437434873483
                     , 'rate_night'=>15,'email'=>"correo@gmail.com","address"=>"Direccion",'contact'=>'Contacto','cel'=>565633543],
                 [ 'date_in'=>'01/01/2000','date_out'=>'15/01/2000','birthdate'=>'15/01/2000','name'=>'Marco','last_name'=>'Polo','salary'=>10,'social_number'=>38437434873483
                     , 'rate_night'=>15,'email'=>"correo2@gmail.com","address"=>"Direccion",'contact'=>'Contacto','cel'=>565633543]

@@ -17,7 +17,7 @@ class BonusController extends Controller
 {
     public function index(Request $request, $type)
     {
-        $query = DB::table('bonus')->join('detail_bonus', 'detail_bonus.id_bonus', '=', 'bonus.id');
+        $query = DB::table('bonus')->join('detail_bonus', 'detail_bonus.id_bonus', '=', 'bonus.id')->select('detail_bonus.*','bonus.name');
         if ($type) {
             $query = $query->where('permanent', '=', true)->where('active', '=', 1);
         } else {

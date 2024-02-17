@@ -20,7 +20,6 @@ class CreateDetailBonusTable extends Migration
             $table->string('calc')->comment('Tipo 1 es monto fijo 2 es porcentual')->default('1');
             $table->decimal('amount');
             $table->date('date');
-
             $table->boolean('general')->default(true);
             $table->boolean('active')->default(true);
             $table->timestamps();

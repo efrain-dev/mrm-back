@@ -17,16 +17,37 @@ class PayrollController extends Controller
 {
     public function index(Request $request)
     {
-
-        $payroll = DB::table('payroll')->get();
+        $filter= $request->get('filter');
+        $show = $request->get('type');
+        [$from, $to] = $this->getDates($request);
+        $query = DB::table('payroll as p')
+            ->where(function ($query) use ($filter) {
+                $query = $query->orWhere('p.id', 'like', '%' . $filter . '%');
+            })->whereDate("p.start",'>=',$from)->whereDate("p.end",'<=',$to);
+        switch ($show) {
+            case "D":
+            {
+                $query = $query->where('p.type', '=', "D");
+                break;
+            }
+            case"N":
+            {
+                $query = $query->where('p.type', '=', "N");
+                break;
+            }
+            default:
+        }
+        $payroll = $query->get();
         return response()->json($payroll);
     }
+
 
     public function getPayrollsApi(Request $request)
     {
         [$from, $to] = $this->getDates($request);
-        [$payroll, $from, $to, $net_pay, $ncdor, $total, $gross_pay, $desc, $bon] = $this->getPayrolls($from, $to);
+        [$payroll, $from, $to, $net_pay, $ncdor, $total, $gross_pay, $desc, $bon] = $this->getPayrolls($from, $to,'','');
         return response()->json(['payrolls' => $payroll, "from" => "$from", "to" => "$to", "net_pay" => $net_pay, "ncdor" => $ncdor, "total" => $total, "gross_pay" => $gross_pay, "desc" => $desc, "bon" => $bon]);
+
     }
 
     public function getWorkerApi(Request $request)
@@ -38,14 +59,16 @@ class PayrollController extends Controller
         ]);
         $worker = $request->get('worker');
         [$payroll, $from, $to, $net_pay, $ncdor, $total, $gross_pay, $desc, $bon,$worker] = $this->getPayrollsWorker($from, $to, $worker);
-        return response()->json(['payrolls' => $payroll,'worker'=>$worker, "from" => "$from", "to" => "$to", "net_pay" => $net_pay, "ncdor" => $ncdor, "total" => $total, 'gross_pay' => $gross_pay, "desc" => $desc, "bon" => $bon]);
+        return response()->json(['worker'=>$worker, "from" => "$from", "to" => "$to", "net_pay" => $net_pay, "ncdor" => $ncdor, "total" => $total, 'gross_pay' => $gross_pay, "desc" => $desc, "bon" => $bon]);
+
+
     }
 
 
     public function getPayrolls($from, $to)
     {
         $payroll = DB::table('payroll as p')
-            ->whereBetween('p.end', ["$to", "$from"])
+            ->whereDate("p.start",'>=',$from)->whereDate("p.end",'<=',$to)
             ->get();
         $payroll->map(function ($item) {
             [$payroll,] = $this->calcPayroll($item);
@@ -83,9 +106,7 @@ class PayrollController extends Controller
                 $this->calcEmpleado($item->id, $item->type, $worker);
             $item->net_pay = $net_pay;
             $item->ncdor = $ncdor;
-            $item->total = $subtotal;
             $item->gross_pay = $gross_pay;
-            $item->total = $subtotal;
             $item->desc = $desc;
             $item->bon = $bon;
 
@@ -103,8 +124,8 @@ class PayrollController extends Controller
     {
         $from = $request->get('from');
         $to = $request->get('to');
-        $from = $from ? Carbon::createFromFormat('d/m/Y', $from) : Carbon::now()->startOfYear()->subDays(1)->format('d/m/Y');
-        $to = $to ? Carbon::createFromFormat('d/m/Y', $to)->addDay() : Carbon::now()->addMonth()->startOfMonth()->format('d/m/Y');
+        $from = $from ? Carbon::createFromFormat('d/m/Y', $from) : Carbon::now()->startOfYear();
+        $to = $to ? Carbon::createFromFormat('d/m/Y', $to)->addDay() : Carbon::now()->addMonth()->startOfMonth();
         return [$from, $to];
     }
 

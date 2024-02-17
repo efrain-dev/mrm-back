@@ -25,10 +25,10 @@ class WorkerController extends Controller
                 $query = $query->orWhere('w.contact', 'like', '%' . $filter . '%');
             });
         if ($hire['active']) {
-            $workers = $workers->whereBetween('w.date_in', [$hire['from']->format('d-m-Y'), $hire['to']->format('d-m-Y')]);
+            $workers = $workers->whereBetween('w.date_in', [$hire['from'], $hire['to']]);
         }
         if ($birthdate['active']) {
-            $workers = $workers->whereBetween('w.birthdate', [$birthdate['from']->format('d-m-Y'), $birthdate['to']->format('d-m-Y')]);
+            $workers = $workers->whereBetween('w.birthdate', [$birthdate['from'], $birthdate['to']]);
         }
         switch ($active) {
             case 1:
@@ -80,6 +80,9 @@ class WorkerController extends Controller
                 'contact' => 'required',
             ]);
             $data = $request->all();
+            $data['date_in'] = $data['date_in']? Carbon::createFromFormat('d/m/Y', $data['date_in']):'';
+            $data['date_out'] = $data['date_out']? Carbon::createFromFormat('d/m/Y', $data['date_out']):'';
+            $data['birthdate'] = $data['birthdate']? Carbon::createFromFormat('d/m/Y', $data['birthdate']):'';
             Worker::create($data);
             return response()->json([
                 'status' => 1,
