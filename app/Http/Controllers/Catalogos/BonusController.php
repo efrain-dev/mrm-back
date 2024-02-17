@@ -15,16 +15,20 @@ use Illuminate\Support\Facades\DB;
 
 class BonusController extends Controller
 {
-    public function index(Request $request,$type)
-    {     $query = DB::table('bonus')->join('detail_bonus','detail_bonus.id_bonus','=','bonus.id');
-        if ($type){
-            $query = $query->where('permanent','=',true);
-        }else{
-            $query = $query->where('permanent','=',false);
+    public function index(Request $request, $type)
+    {
+        $query = DB::table('bonus')->join('detail_bonus', 'detail_bonus.id_bonus', '=', 'bonus.id');
+        if ($type) {
+            $query = $query->where('permanent', '=', true)->where('active', '=', 1);
+        } else {
+            $query = $query->where('permanent', '=', false);
         }
+
         $bonus = $query->get();
+
         return response()->json($bonus);
     }
+
     public function getBonus(Request $request)
     {
         $this->validate($request, [
@@ -33,14 +37,15 @@ class BonusController extends Controller
         ]);
 
         $query = DB::table('bonus_payroll')
-            ->join('detail_bonus','detail_bonus.id','=','bonus_payroll.id_detail_bonus')
-            ->join('bonus','bonus.id','=','detail_bonus.id_bonus')
-            ->select('detail_bonus.amount','detail_bonus.date','bonus_payroll.id','bonus.name as bonus')->get();
+            ->join('detail_bonus', 'detail_bonus.id', '=', 'bonus_payroll.id_detail_bonus')
+            ->join('bonus', 'bonus.id', '=', 'detail_bonus.id_bonus')
+            ->select('detail_bonus.amount', 'detail_bonus.date', 'bonus_payroll.id', 'bonus.name as bonus')->get();
         return response()->json($query);
     }
+
     public function getType(Request $request)
     {
-        $bonus = DB::table('bonus')->where('permanent','=',false)->get();
+        $bonus = DB::table('bonus')->where('permanent', '=', false)->get();
         return response()->json($bonus);
     }
 
@@ -75,19 +80,19 @@ class BonusController extends Controller
                 'amount' => 'required',
                 'bonus' => 'required',
                 'payroll' => 'required',
-                'date'=>'required',
-                'worker'=>'required',
+                'date' => 'required',
+                'worker' => 'required',
 
             ]);
             $data = $request->all();
             $bonus = BonusDetail::create(
                 [
-                    'amount'=>$data['amount'],
-                    'id_bonus'=>$data['bonus'],
-                    'calc'=>1,
-                    'date'=>Carbon::createFromFormat('d/m/Y', $data['date']),
+                    'amount' => $data['amount'],
+                    'id_bonus' => $data['bonus'],
+                    'calc' => 1,
+                    'date' => Carbon::createFromFormat('d/m/Y', $data['date']),
                 ]);
-            PayrollBonus::create(['id_detail_bonus'=>$bonus->id,'id_payroll'=>$data['payroll'],'id_worker'=>$data['worker']]);
+            PayrollBonus::create(['id_detail_bonus' => $bonus->id, 'id_payroll' => $data['payroll'], 'id_worker' => $data['worker']]);
 
             return response()->json([
                 'status' => 1,
@@ -102,34 +107,37 @@ class BonusController extends Controller
 
     }
 
-//    public function editDetailBonus(Request $request)
-//    {
-//        $this->validate($request, [
-//            'amount' => 'required',
-//            'calc' => 'required',
-//            'general' => 'required',
-//            'active' => 'required',
-//            'id_bonus' => 'required',
-//            'id_detail' => 'required',
-//        ]);
-//        $data = $request->all();
-//        try {
-//            $message = DB::transaction(function () use ($data) {
-//                BonusDetail::find($data['id_detail'])->update(['active' => false]);
-//                unset($data['id_detail']);
-//                BonusDetail::create($data);
-//                return [
-//                    'status' => 1,
-//                    'message' => 'Successfully updated bonus'
-//                ];
-//            });
-//        } catch (Exception $e) {
-//            $message = ['status' => 'error', 'message' => $e->getMessage(), 500];
-//        }
-//        return response()->json($message);
-//    }
+    public function editDetailBonus(Request $request)
+    {
+        $this->validate($request, [
+            'amount' => 'required',
+            'id' => 'required',
+        ]);
+        $data = $request->all();
 
-    public function deleteBonus(Request $request,$id)
+        try {
+            $message = DB::transaction(function () use ($data) {
+                $bonus = BonusDetail::find($data['id']);
+                $bonus->update(['active' => false]);
+                BonusDetail::create( [
+                    'amount' => $data['amount'],
+                    'id_bonus' => $bonus->id_bonus,
+                    'calc' => 2,
+                    'date' =>Carbon::now(),
+                    'permanent'=>true
+                ]);
+                return [
+                    'status' => 1,
+                    'message' => 'Successfully updated bonus'
+                ];
+            });
+        } catch (Exception $e) {
+            $message = ['status' => 'error', 'message' => $e->getMessage(), 500];
+        }
+        return response()->json($message);
+    }
+
+    public function deleteBonus(Request $request, $id)
     {
         try {
             BonusDetail::find($id)->delete();

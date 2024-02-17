@@ -54,6 +54,12 @@ class GlobalSeeder extends Seeder
                 [ 'start'=>'16/01/2000','end'=>'31/01/2000','type'=>'D','users_id'=>1,'description'=>"Descripcion de planilla"],
             ]
         );
+        $global = DB::table('bonus')->join('detail_bonus', 'detail_bonus.id_bonus', '=', 'bonus.id')->where('permanent', '=', true)
+            ->where('active', '=', 1)->select('detail_bonus.id as id')->get();
+        foreach ($global as $item){
+            DB::table('bonus_payroll')->insert(['id_detail_bonus' => $item->id, 'id_payroll'=>1,'id_worker'=>null]);
+            DB::table('bonus_payroll')->insert(['id_detail_bonus' => $item->id, 'id_payroll'=>2,'id_worker'=>null]);
+        }
 
         DB::table('worker')->insert([
                 [ 'date_in'=>'01/01/2000','date_out'=>'15/01/2000','birthdate'=>'15/01/2000','name'=>'Roberto','last_name'=>'Carlos','salary'=>10,'social_number'=>38437434873483

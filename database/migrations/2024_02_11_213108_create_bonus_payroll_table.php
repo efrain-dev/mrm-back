@@ -19,7 +19,7 @@ class CreateBonusPayrollTable extends Migration
             $table->foreign('id_detail_bonus','fk_detail_bonuspay')->references('id')->on('detail_bonus');
             $table->integer('id_payroll')->unsigned();
             $table->foreign('id_payroll','fk_id_payroll')->references('id')->on('payroll');
-            $table->integer('id_worker')->unsigned();
+            $table->integer('id_worker')->unsigned()->nullable();
             $table->foreign('id_worker','fk_worker_bonus')->references('id')->on('worker');
         });
 

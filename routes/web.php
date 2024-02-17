@@ -31,6 +31,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         $router->get('/get-bonus', 'Catalogos\BonusController@getBonus');
         $router->get('/type', 'Catalogos\BonusController@getType');
         $router->post('', 'Catalogos\BonusController@newBonus');
+        $router->post('/edit', 'Catalogos\BonusController@editDetailBonus');
         $router->delete('/{id}/delete', 'Catalogos\BonusController@deleteBonus');
 
     });
