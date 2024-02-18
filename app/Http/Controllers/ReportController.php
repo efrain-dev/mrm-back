@@ -4,10 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Catalogos\PayrollController;
 
-use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
+
 
 class ReportController extends Controller
 {
@@ -32,7 +30,7 @@ class ReportController extends Controller
         $worker = $request->get('worker');
         $payroll = $request->get('payroll');
 
-        $result =  $this->payrollController->getPayrollsWorker($from, $to, $worker,$payroll ,true);
+        $result =  $this->payrollController->getPayrollsWorker($from, $to, $worker,$payroll ,false);
         return response()->json($result);
     }
 
