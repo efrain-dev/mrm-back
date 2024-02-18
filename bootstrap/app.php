@@ -76,13 +76,10 @@ $app->configure('jwt');
 // $app->middleware([
 //     App\Http\Middleware\ExampleMiddleware::class
 // ]);
-$app->middleware([
-    App\Http\Middleware\CorsMiddleware::class
-]);
+
 $app->routeMiddleware([
     'auth' => App\Http\Middleware\Authenticate::class,
     'jwt' => App\Http\Middleware\JWTMiddleware::class,
-
 ]);
 
 /*
@@ -102,7 +99,9 @@ $app->register(App\Providers\AuthServiceProvider::class);
 $app->register(Tymon\JWTAuth\Providers\LumenServiceProvider::class);
 $app->register(Illuminate\Mail\MailServiceProvider::class);
 $app->configure('mail');
-
+$app->middleware([
+    App\Http\Middleware\CorsMiddleware::class,
+]);
 /*
 |--------------------------------------------------------------------------
 | Load The Application Routes
