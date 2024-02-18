@@ -17,6 +17,12 @@ class PayrollController extends Controller
 {
     public function index(Request $request)
     {
+        $this->validate($request, [
+            'from'=>'nullable',
+            'to'=>'nullable',
+            'filter'=>'nullable',
+            'type'=>'nullable',
+        ]);
         $filter = $request->get('filter');
         $show = $request->get('type');
         [$from, $to] = $this->getDates($request);
@@ -44,9 +50,23 @@ class PayrollController extends Controller
 
     public function getPayrollsApi(Request $request)
     {
+        $this->validate($request, [
+            'from'=>'nullable',
+            'to'=>'nullable'
+        ]);
         [$from, $to] = $this->getDates($request);
-        [$payroll, $from, $to, $net_pay, $ncdor, $total, $gross_pay, $desc, $bon] = $this->getPayrolls($from, $to, '', '');
-        return response()->json(["from" => "$from", "to" => "$to", "net_pay" => $net_pay, "ncdor" => $ncdor, "total" => $total, "gross_pay" => $gross_pay, "desc" => $desc, "bon" => $bon]);
+        [$payroll, $from, $to, $net_pay, $ncdor, $total, $gross_pay, $desc, $bon] = $this->getPayrolls($from, $to);
+        $totales = [
+            'net_pay' => $net_pay,
+            'ncdor' => $ncdor,
+            'total' => $total,
+            'gross_pay' => $gross_pay,
+            'desc' => $desc,
+            'bon' => $bon,
+            'from' => $from,
+            'to' => $to,
+        ];
+        return response()->json($totales);
 
     }
 
@@ -56,14 +76,17 @@ class PayrollController extends Controller
         [$from, $to] = $this->getDates($request);
         $this->validate($request, [
             'worker' => 'required',
+            'last' => 'required',
+            'payroll' => 'nullable',
+            'from'=>'nullable',
+            'to'=>'nullable'
         ]);
         $worker = $request->get('worker');
-        [$payroll, $from, $to, $net_pay, $ncdor, $total, $gross_pay, $desc, $bon, $worker] = $this->getPayrollsWorker($from, $to, $worker);
-        return response()->json(['worker' => $worker, "from" => "$from", "to" => "$to", "net_pay" => $net_pay, "ncdor" => $ncdor, "total" => $total, 'gross_pay' => $gross_pay, "desc" => $desc, "bon" => $bon, 'last' => $payroll->last()]);
-
-
+        $last = $request->get('last');
+        $payroll = $request->get('payroll');
+        $result = $this->getPayrollsWorker($from, $to, $worker,$payroll,$last);
+        return response()->json($result);
     }
-
 
     public function getPayrolls($from, $to)
     {
@@ -95,17 +118,26 @@ class PayrollController extends Controller
         return $payroll;
     }
 
-    public function getPayrollsWorker($from, $to, $id)
+    public function getPayrollsWorker($from, $to, $id, $payroll = null, $last = false)
     {
-        $payroll = DB::table('report as r')->join('payroll as p', 'p.id', '=', 'r.id_payroll')
+        $query = DB::table('report as r')->join('payroll as p', 'p.id', '=', 'r.id_payroll')
             ->select('p.*')
             ->where('r.id_worker', $id)
-            ->whereDate("p.start", '>=', $from)->whereDate("p.end", '<=', $to)
-            ->groupBy('p.id')
-            ->get();
+            ->groupBy('p.id');
+
+        if ($payroll) {
+            $payroll = $query->where('r.id_payroll', '=', $payroll)->get();
+        } else {
+            if ($last) {
+                $payroll = $query->orderBy('p.start', 'DESC')->take(1)->get();
+            } else {
+                $payroll = $query->whereDate("p.start", '>=', $from)->whereDate("p.end", '<=', $to)->get();
+            }
+        }
         $worker = DB::table('worker as w')
             ->where('w.id', $id)
             ->select('w.name', 'w.last_name', 'w.salary as rate', 'w.rate_night', 'w.id as id_worker')->first();
+
         $payroll->map(function ($item) use ($worker) {
             [$detail_bonus, $reports, $total_hours, $regular_hours, $extra_hours, $night_hours, $overtime_night_hours
                 , $period_regular, $night, $overtime_regular, $overtime_night, $bon, $desc, $net_pay, $ncdor
@@ -116,15 +148,21 @@ class PayrollController extends Controller
             $item->gross_pay = $gross_pay;
             $item->desc = $desc;
             $item->bon = $bon;
-
+            $item->detail_bonus = $detail_bonus;
+            $item->reports = $reports;
         });
-        $net_pay = $payroll->sum('net_pay');
-        $ncdor = $payroll->sum('ncdor');
-        $total = $payroll->sum('total');
-        $gross_pay = $payroll->sum('gross_pay');
-        $desc = $payroll->sum('desc');
-        $bon = $payroll->sum('bon');
-        return ([$payroll, "$from", "$to", $net_pay, $ncdor, $total, $gross_pay, $desc, $bon, $worker]);
+        return [
+            'net_pay' => $payroll->sum('net_pay'),
+            'ncdor' => $payroll->sum('ncdor'),
+            'total' => $payroll->sum('total'),
+            'gross_pay' => $payroll->sum('gross_pay'),
+            'desc' => $payroll->sum('desc'),
+            'bon' => $payroll->sum('bon'),
+            'from' => $from,
+            'to' => $to,
+            'worker' => $worker,
+            'payroll' => $payroll
+        ];
     }
 
     public function getDates($request)

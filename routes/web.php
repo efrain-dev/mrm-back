@@ -34,30 +34,32 @@ $router->group(['prefix' => 'api', 'middleware' => 'auth'], function () use ($ro
         $router->delete('/{id}/delete', 'Catalogos\BonusController@deleteBonus');
     });
     $router->group(['prefix' => 'worker'], function () use ($router) {
-        $router->get('','Catalogos\WorkerController@index');
-        $router->get('/get/{id}','Catalogos\WorkerController@show');
-        $router->post('','Catalogos\WorkerController@store');
-        $router->patch('/{id}','Catalogos\WorkerController@update');
-        $router->delete('/{id}/delete','Catalogos\WorkerController@destroy');
+        $router->get('', 'Catalogos\WorkerController@index');
+        $router->get('/get/{id}', 'Catalogos\WorkerController@show');
+        $router->post('', 'Catalogos\WorkerController@store');
+        $router->patch('/{id}', 'Catalogos\WorkerController@update');
+        $router->delete('/{id}/delete', 'Catalogos\WorkerController@destroy');
 
 
     });
     $router->group(['prefix' => 'payroll'], function () use ($router) {
-        $router->get('','Catalogos\PayrollController@index');
-        $router->post('','Catalogos\PayrollController@newPayroll');
-        $router->get('/get','Catalogos\PayrollController@showPayroll');
+        $router->get('', 'Catalogos\PayrollController@index');
+        $router->post('', 'Catalogos\PayrollController@newPayroll');
+        $router->get('/get', 'Catalogos\PayrollController@showPayroll');
+        $router->get('/year', 'Catalogos\PayrollController@getPayrollsApi');
+        $router->get('/worker', 'Catalogos\PayrollController@getWorkerApi');
+
     });
     $router->group(['prefix' => 'detail'], function () use ($router) {
-        $router->get('','Catalogos\DetailController@getReport');
-        $router->post('','Catalogos\DetailController@newDetail');
-        $router->get('/get','Catalogos\DetailController@getReport');
-        $router->delete('/{id}/delete','Catalogos\DetailController@deleteReport');
+        $router->get('', 'Catalogos\DetailController@getReport');
+        $router->post('', 'Catalogos\DetailController@newDetail');
+        $router->get('/get', 'Catalogos\DetailController@getReport');
+        $router->delete('/{id}/delete', 'Catalogos\DetailController@deleteReport');
 
     });
     $router->group(['prefix' => 'report'], function () use ($router) {
-        $router->get('/payroll','Catalogos\PayrollController@getPayrollsApi');
-        $router->get('/worker','Catalogos\PayrollController@getWorkerApi');
+        $router->get('/pdf-worker', 'ReportController@getPFDWorker');
     });
-    $router->post('/send','Catalogos\WorkerController@sendMail');
+    $router->post('/send', 'Catalogos\WorkerController@sendMail');
 
 });
