@@ -46,7 +46,6 @@ class WorkerController extends Controller
                 break;
             }
             default:
-
         }
 
         $workers = $query->get();
