@@ -37,7 +37,7 @@ $router->group(['prefix' => 'api', 'middleware' => 'auth'], function () use ($ro
         $router->get('','Catalogos\WorkerController@index');
         $router->get('/get/{id}','Catalogos\WorkerController@show');
         $router->post('','Catalogos\WorkerController@store');
-        $router->post('/update/{id}','Catalogos\WorkerController@update');
+        $router->patch('/{id}','Catalogos\WorkerController@update');
         $router->delete('/{id}/delete','Catalogos\WorkerController@destroy');
 //        $router->post('/send','Catalogos\WorkerController@sendMail');
 
