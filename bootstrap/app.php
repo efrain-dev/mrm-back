@@ -26,7 +26,7 @@ $app = new Laravel\Lumen\Application(
 $app->withFacades();
 
 $app->withEloquent();
-$app->configure('jwt');
+
 
 /*
 |--------------------------------------------------------------------------
@@ -61,7 +61,7 @@ $app->singleton(
 */
 
 $app->configure('app');
-
+$app->configure('jwt');
 /*
 |--------------------------------------------------------------------------
 | Register Middleware
@@ -76,15 +76,15 @@ $app->configure('app');
 // $app->middleware([
 //     App\Http\Middleware\ExampleMiddleware::class
 // ]);
-
+$app->middleware([
+    App\Http\Middleware\CorsMiddleware::class
+]);
 $app->routeMiddleware([
     'auth' => App\Http\Middleware\Authenticate::class,
     'jwt' => App\Http\Middleware\JWTMiddleware::class,
 
 ]);
-$app->middleware([
-    App\Http\Middleware\CorsMiddleware::class
-]);
+
 /*
 |--------------------------------------------------------------------------
 | Register Service Providers
@@ -100,7 +100,15 @@ $app->middleware([
 $app->register(App\Providers\AuthServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
 $app->register(Tymon\JWTAuth\Providers\LumenServiceProvider::class);
+$app->register(Illuminate\Mail\MailServiceProvider::class);
+$app->configure('mail');
 
+$app->alias('mail.manager', Illuminate\Mail\MailManager::class);
+$app->alias('mail.manager', Illuminate\Contracts\Mail\Factory::class);
+
+$app->alias('mailer', Illuminate\Mail\Mailer::class);
+$app->alias('mailer', Illuminate\Contracts\Mail\Mailer::class);
+$app->alias('mailer', Illuminate\Contracts\Mail\MailQueue::class);
 /*
 |--------------------------------------------------------------------------
 | Load The Application Routes

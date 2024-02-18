@@ -50,8 +50,8 @@ class DetailController extends Controller
 
             ]);
             $data = $request->all();
-            $data['start'] =  Carbon::createFromFormat('d/m/Y', $data['start']);
-            $data['end'] =   Carbon::createFromFormat('d/m/Y', $data['end']) ;
+            $data['start'] =  Carbon::createFromFormat('Y-m-d', $data['start']);
+            $data['end'] =   Carbon::createFromFormat('Y-m-d', $data['end']) ;
             $data['users_id'] = $request->user()->id;
 
             Report::create($data);

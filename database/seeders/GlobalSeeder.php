@@ -51,8 +51,8 @@ class GlobalSeeder extends Seeder
             ]
         );
         DB::table('payroll')->insert([
-                [ 'start'=>  Carbon::createFromFormat('d/m/Y', '01/01/2024') ,'end'=> Carbon::createFromFormat('d/m/Y', '15/01/2024') ,'type'=>'D','users_id'=>1,'description'=>"Descripcion de planilla dia"],
-                [ 'start'=> Carbon::createFromFormat('d/m/Y', '16/01/2024'),'end'=>Carbon::createFromFormat('d/m/Y', '31/01/2024'),'type'=>'N','users_id'=>1,'description'=>"Descripcion de planilla noche"],
+                [ 'start'=>  Carbon::createFromFormat('Y-m-d', '01/01/2024') ,'end'=> Carbon::createFromFormat('Y-m-d', '15/01/2024') ,'type'=>'D','users_id'=>1,'description'=>"Descripcion de planilla dia"],
+                [ 'start'=> Carbon::createFromFormat('Y-m-d', '16/01/2024'),'end'=>Carbon::createFromFormat('Y-m-d', '31/01/2024'),'type'=>'N','users_id'=>1,'description'=>"Descripcion de planilla noche"],
             ]
         );
         $global = DB::table('bonus')->join('detail_bonus', 'detail_bonus.id_bonus', '=', 'bonus.id')->where('permanent', '=', true)

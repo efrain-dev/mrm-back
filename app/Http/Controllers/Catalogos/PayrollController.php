@@ -17,13 +17,13 @@ class PayrollController extends Controller
 {
     public function index(Request $request)
     {
-        $filter= $request->get('filter');
+        $filter = $request->get('filter');
         $show = $request->get('type');
         [$from, $to] = $this->getDates($request);
         $query = DB::table('payroll as p')
             ->where(function ($query) use ($filter) {
                 $query = $query->orWhere('p.id', 'like', '%' . $filter . '%');
-            })->whereDate("p.start",'>=',$from)->whereDate("p.end",'<=',$to);
+            })->whereDate("p.start", '>=', $from)->whereDate("p.end", '<=', $to);
         switch ($show) {
             case "D":
             {
@@ -38,15 +38,15 @@ class PayrollController extends Controller
             default:
         }
         $payroll = $query->get();
+        $payroll = $this->mapPayroll($payroll);
         return response()->json($payroll);
     }
-
 
     public function getPayrollsApi(Request $request)
     {
         [$from, $to] = $this->getDates($request);
-        [$payroll, $from, $to, $net_pay, $ncdor, $total, $gross_pay, $desc, $bon] = $this->getPayrolls($from, $to,'','');
-        return response()->json(['payrolls' => $payroll, "from" => "$from", "to" => "$to", "net_pay" => $net_pay, "ncdor" => $ncdor, "total" => $total, "gross_pay" => $gross_pay, "desc" => $desc, "bon" => $bon]);
+        [$payroll, $from, $to, $net_pay, $ncdor, $total, $gross_pay, $desc, $bon] = $this->getPayrolls($from, $to, '', '');
+        return response()->json(["from" => "$from", "to" => "$to", "net_pay" => $net_pay, "ncdor" => $ncdor, "total" => $total, "gross_pay" => $gross_pay, "desc" => $desc, "bon" => $bon]);
 
     }
 
@@ -58,8 +58,8 @@ class PayrollController extends Controller
             'worker' => 'required',
         ]);
         $worker = $request->get('worker');
-        [$payroll, $from, $to, $net_pay, $ncdor, $total, $gross_pay, $desc, $bon,$worker] = $this->getPayrollsWorker($from, $to, $worker);
-        return response()->json(['worker'=>$worker, "from" => "$from", "to" => "$to", "net_pay" => $net_pay, "ncdor" => $ncdor, "total" => $total, 'gross_pay' => $gross_pay, "desc" => $desc, "bon" => $bon]);
+        [$payroll, $from, $to, $net_pay, $ncdor, $total, $gross_pay, $desc, $bon, $worker] = $this->getPayrollsWorker($from, $to, $worker);
+        return response()->json(['worker' => $worker, "from" => "$from", "to" => "$to", "net_pay" => $net_pay, "ncdor" => $ncdor, "total" => $total, 'gross_pay' => $gross_pay, "desc" => $desc, "bon" => $bon, 'last' => $payroll->last()]);
 
 
     }
@@ -68,17 +68,9 @@ class PayrollController extends Controller
     public function getPayrolls($from, $to)
     {
         $payroll = DB::table('payroll as p')
-            ->whereDate("p.start",'>=',$from)->whereDate("p.end",'<=',$to)
+            ->whereDate("p.start", '>=', $from)->whereDate("p.end", '<=', $to)
             ->get();
-        $payroll->map(function ($item) {
-            [$payroll,] = $this->calcPayroll($item);
-            $item->desc = $payroll->desc;
-            $item->bon = $payroll->bon;
-            $item->net_pay = $payroll->net_pay;
-            $item->ncdor = $payroll->ncdor;
-            $item->total = $payroll->total;
-            $item->gross_pay = $payroll->gross_pay;
-        });
+        $payroll = $this->mapPayroll($payroll);
         $desc = $payroll->sum('desc');
         $bon = $payroll->sum('bon');
         $net_pay = $payroll->sum('net_pay');
@@ -89,12 +81,27 @@ class PayrollController extends Controller
 
     }
 
+    private function mapPayroll($payroll)
+    {
+        $payroll->map(function ($item) {
+            [$payroll,] = $this->calcPayroll($item);
+            $item->desc = $payroll->desc;
+            $item->bon = $payroll->bon;
+            $item->net_pay = $payroll->net_pay;
+            $item->ncdor = $payroll->ncdor;
+            $item->total = $payroll->total;
+            $item->gross_pay = $payroll->gross_pay;
+        });
+        return $payroll;
+    }
+
     public function getPayrollsWorker($from, $to, $id)
     {
         $payroll = DB::table('report as r')->join('payroll as p', 'p.id', '=', 'r.id_payroll')
             ->select('p.*')
             ->where('r.id_worker', $id)
-            ->whereBetween('p.end', ["$to", "$from"])->groupBy('p.id')
+            ->whereDate("p.start", '>=', $from)->whereDate("p.end", '<=', $to)
+            ->groupBy('p.id')
             ->get();
         $worker = DB::table('worker as w')
             ->where('w.id', $id)
@@ -117,15 +124,15 @@ class PayrollController extends Controller
         $gross_pay = $payroll->sum('gross_pay');
         $desc = $payroll->sum('desc');
         $bon = $payroll->sum('bon');
-        return ([$payroll, "$from", "$to", $net_pay, $ncdor, $total, $gross_pay,$desc,$bon,$worker]);
+        return ([$payroll, "$from", "$to", $net_pay, $ncdor, $total, $gross_pay, $desc, $bon, $worker]);
     }
 
     public function getDates($request)
     {
         $from = $request->get('from');
         $to = $request->get('to');
-        $from = $from ? Carbon::createFromFormat('d/m/Y', $from) : Carbon::now()->startOfYear();
-        $to = $to ? Carbon::createFromFormat('d/m/Y', $to)->addDay() : Carbon::now()->addMonth()->startOfMonth();
+        $from = $from ? Carbon::createFromFormat('Y-m-d', $from) : Carbon::now()->startOfYear()->subDay();
+        $to = $to ? Carbon::createFromFormat('Y-m-d', $to)->addDay() : Carbon::now()->addMonth()->startOfMonth();
         return [$from, $to];
     }
 
@@ -269,8 +276,8 @@ class PayrollController extends Controller
                 'description' => 'required'
             ]);
             $data = $request->all();
-            $data['start'] = Carbon::createFromFormat('d/m/Y', $data['start']);
-            $data['end'] = Carbon::createFromFormat('d/m/Y', $data['end']);
+            $data['start'] = Carbon::createFromFormat('Y-m-d', $data['start']);
+            $data['end'] = Carbon::createFromFormat('Y-m-d', $data['end']);
             $data['users_id'] = $request->user()->id;
             $payroll = Payroll::create($data);
             $global = DB::table('bonus')->join('detail_bonus', 'detail_bonus.id_bonus', '=', 'bonus.id')->where('permanent', '=', true)

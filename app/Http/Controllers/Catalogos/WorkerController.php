@@ -4,10 +4,10 @@ namespace App\Http\Controllers\Catalogos;
 
 use App\Http\Controllers\Controller;
 use App\Models\Worker;
-use Carbon\Traits\Date;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class WorkerController extends Controller
 {
@@ -53,12 +53,12 @@ class WorkerController extends Controller
         $filter = $request->get('filter') ?: '';
         $active = $request->get('active');
         if ($hire['active']){
-            $hire['from'] = $hire['from'] ?   Carbon::createFromFormat('d/m/Y', $hire['from']) : Carbon::now()->startOfYear()->startOfMonth();
-            $hire['to'] = $hire['to'] ?  Carbon::createFromFormat('d/m/Y', $hire['to']) ->addDay() : Carbon::now()->addMonth()->startOfMonth();
+            $hire['from'] = $hire['from'] ?   Carbon::createFromFormat('Y-m-d', $hire['from']) : Carbon::now()->startOfYear()->startOfMonth();
+            $hire['to'] = $hire['to'] ?  Carbon::createFromFormat('Y-m-d', $hire['to']) ->addDay() : Carbon::now()->addMonth()->startOfMonth();
         }
         if ($birthdate['active']){
-            $birthdate['from'] = $birthdate['from'] ? Carbon::createFromFormat('d/m/Y', $birthdate['from'])   : Carbon::now()->startOfMonth();
-            $birthdate['to'] = $birthdate['to'] ? Carbon::createFromFormat('d/m/Y', $birthdate['to']) ->addDay() : Carbon::now()->addMonth()->startOfMonth();
+            $birthdate['from'] = $birthdate['from'] ? Carbon::createFromFormat('Y-m-d', $birthdate['from'])   : Carbon::now()->startOfMonth();
+            $birthdate['to'] = $birthdate['to'] ? Carbon::createFromFormat('Y-m-d', $birthdate['to']) ->addDay() : Carbon::now()->addMonth()->startOfMonth();
         }
         return [$hire, $birthdate, $filter, $active];
     }
@@ -78,11 +78,13 @@ class WorkerController extends Controller
                 'email' => 'required|email',
                 'address' => 'required',
                 'contact' => 'required',
+                'cel' => 'nullable',
+
             ]);
             $data = $request->all();
-            $data['date_in'] = $data['date_in']? Carbon::createFromFormat('d/m/Y', $data['date_in']):'';
-            $data['date_out'] = $data['date_out']? Carbon::createFromFormat('d/m/Y', $data['date_out']):'';
-            $data['birthdate'] = $data['birthdate']? Carbon::createFromFormat('d/m/Y', $data['birthdate']):'';
+            $data['date_in'] = $data['date_in']? Carbon::createFromFormat('Y-m-d', $data['date_in']):'';
+            $data['date_out'] = $data['date_out']? Carbon::createFromFormat('Y-m-d', $data['date_out']):'';
+            $data['birthdate'] = $data['birthdate']? Carbon::createFromFormat('Y-m-d', $data['birthdate']):'';
             Worker::create($data);
             return response()->json([
                 'status' => 1,
@@ -158,6 +160,23 @@ class WorkerController extends Controller
             ], 500);
         }
     }
+    public function sendMail()
+    {
+        $data['email'] = 'efraindeleon12@outlook.com';
+        $data['title'] = 'Report LastPay';
 
+
+
+        Mail::to('efraindeleon12@outlook.com');
+    }
+//        Mail::send('partial.mail', $data, function ($message) use ($data) {
+//            $message->to('efraindeleon12@outlook.com')
+//                ->subject($data["title"]);
+//        });
+//        Mail::send('partial.mail', $data, function ($message) use ($data, $pdf, $name) {
+//            $message->to($data["email"], $data["email"])
+//                ->subject($data["title"])
+//                ->attachData($pdf->output(), $name);
+//        });
 
 }

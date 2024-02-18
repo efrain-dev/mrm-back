@@ -90,7 +90,7 @@ class BonusController extends Controller
                     'amount' => $data['amount'],
                     'id_bonus' => $data['bonus'],
                     'calc' => 1,
-                    'date' => Carbon::createFromFormat('d/m/Y', $data['date']),
+                    'date' => Carbon::createFromFormat('Y-m-d', $data['date']),
                 ]);
             PayrollBonus::create(['id_detail_bonus' => $bonus->id, 'id_payroll' => $data['payroll'], 'id_worker' => $data['worker']]);
 

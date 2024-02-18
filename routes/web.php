@@ -24,8 +24,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->post('logout', 'LumenAuthController@logout');
     $router->post('refresh', 'LumenAuthController@refresh');
 });
-//$router->group(['prefix' => 'api', 'middleware' => 'auth'], function () use ($router) {
-$router->group(['prefix' => 'api'], function () use ($router) {
+$router->group(['prefix' => 'api', 'middleware' => 'auth'], function () use ($router) {
     $router->group(['prefix' => 'bonus'], function () use ($router) {
         $router->get('/get/{type}', 'Catalogos\BonusController@index');
         $router->get('/get-bonus', 'Catalogos\BonusController@getBonus');
@@ -40,6 +39,9 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         $router->post('','Catalogos\WorkerController@store');
         $router->post('/{id}','Catalogos\WorkerController@update');
         $router->delete('/{id}/delete','Catalogos\WorkerController@destroy');
+        $router->post('/send','Catalogos\WorkerController@sendMail');
+
+
     });
     $router->group(['prefix' => 'payroll'], function () use ($router) {
         $router->get('','Catalogos\PayrollController@index');
