@@ -174,12 +174,11 @@ class WorkerController extends Controller
         $data['title'] = 'Report LastPay';
 
 
-        Mail::to('efraindeleon12@outlook.com');
+        Mail::send('partial.mail', $data, function ($message) use ($data) {
+            $message->to('efraindeleon12@outlook.com')
+                ->subject($data["title"]);
+        });
     }
-//        Mail::send('partial.mail', $data, function ($message) use ($data) {
-//            $message->to('efraindeleon12@outlook.com')
-//                ->subject($data["title"]);
-//        });
 //        Mail::send('partial.mail', $data, function ($message) use ($data, $pdf, $name) {
 //            $message->to($data["email"], $data["email"])
 //                ->subject($data["title"])

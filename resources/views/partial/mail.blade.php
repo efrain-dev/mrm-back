@@ -6,7 +6,7 @@
 <body>
 
 <h3>{{ $title }}</h3>
-<p>{{ $body }}</p>
+<p> Cuerpo</p>
 
 <p>
     Saludos<br/>

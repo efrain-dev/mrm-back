@@ -39,7 +39,6 @@ $router->group(['prefix' => 'api', 'middleware' => 'auth'], function () use ($ro
         $router->post('','Catalogos\WorkerController@store');
         $router->patch('/{id}','Catalogos\WorkerController@update');
         $router->delete('/{id}/delete','Catalogos\WorkerController@destroy');
-//        $router->post('/send','Catalogos\WorkerController@sendMail');
 
 
     });
@@ -59,5 +58,6 @@ $router->group(['prefix' => 'api', 'middleware' => 'auth'], function () use ($ro
         $router->get('/payroll','Catalogos\PayrollController@getPayrollsApi');
         $router->get('/worker','Catalogos\PayrollController@getWorkerApi');
     });
+    $router->post('/send','Catalogos\WorkerController@sendMail');
 
 });
