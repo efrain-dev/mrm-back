@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Catalogos\PayrollController;
 
+use App\Models\Payroll;
 use Illuminate\Http\Request;
 
 
@@ -29,10 +30,19 @@ class ReportController extends Controller
         [$from, $to]= $this->payrollController->getDates($request);
         $worker = $request->get('worker');
         $payroll = $request->get('payroll');
+        $last = $request->get('last');
 
-        $result =  $this->payrollController->getPayrollsWorker($from, $to, $worker,$payroll ,false);
+        $result =  $this->payrollController->getPayrollsWorker($from, $to, $worker,$payroll ,$last);
+
+        dd($this->pdfWorker()->stream('pdf.pdf'));
         return response()->json($result);
     }
 
-
+    public function pdfWorker(){
+        $pdf = app('dompdf.wrapper');
+        $pdf->getDomPDF()->set_option("enable_php", true);
+        $data = 0;
+        $pdf->loadView('pdf.worker',compact('data'))->setPaper('a4', 'portrait');
+        return $pdf;
+    }
 }
