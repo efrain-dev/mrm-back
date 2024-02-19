@@ -50,10 +50,12 @@ class DetailController extends Controller
 
             ]);
             $data = $request->all();
+            $worker = Worker::find( $data['id_worker']);
             $data['start'] =  Carbon::createFromFormat('Y-m-d', $data['start']);
             $data['end'] =   Carbon::createFromFormat('Y-m-d', $data['end']) ;
             $data['users_id'] = $request->user()->id;
-
+            $data['rate'] = $worker->salary;
+            $data['rate_night'] = $worker->rate_night;
             Report::create($data);
             return response()->json([
                 'status' => 1,

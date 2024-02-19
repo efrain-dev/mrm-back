@@ -22,11 +22,10 @@ class WorkerController extends Controller
         try {
             $worker = Worker::find($request->get('worker'));
             $config = Config::find(1);
-//        $data['email'] =$worker->email;
-            $data['email'] ='efraindeleon12@outlook.com';
+            $data['email'] = $worker->email;
             $data['title'] = $config->title_videos;
             $data['body'] = $config->videos;
-            $data['name'] =  $worker->name . ' '. $worker->last_name;
+            $data['name'] = $worker->name . ' ' . $worker->last_name;
             $data['link'] = Link::all();
             Mail::send('partial.link', $data, function ($message) use ($data) {
                 $message->to($data["email"], $data["email"])

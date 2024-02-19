@@ -21,6 +21,8 @@ class CreateReportTable extends Migration
             $table->integer('overtime_night');
             $table->dateTime('start');
             $table->dateTime('end');
+            $table->decimal('rate')->default(10);
+            $table->string('rate_night')->default(15);
             $table->integer('id_payroll')->unsigned();
             $table->foreign('id_payroll','fk_report_payroll')->references('id')->on('payroll');
             $table->integer('id_worker')->unsigned();

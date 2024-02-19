@@ -129,7 +129,7 @@ class PayrollController extends Controller
         $ncdor = $payroll->sum('ncdor');
         $total = $payroll->sum('total');
         $gross_pay = $payroll->sum('gross_pay');
-        return ([$payroll, "$from", "$to", $net_pay, $ncdor, $total, $gross_pay, $desc, $bon]);
+        return ([$payroll, $from->addDay(), $to, $net_pay, $ncdor, $total, $gross_pay, $desc, $bon]);
 
     }
 
@@ -165,12 +165,11 @@ class PayrollController extends Controller
         }
         $worker = DB::table('worker as w')
             ->where('w.id', $id)
-            ->select('w.name', 'w.last_name', 'w.salary as rate', 'w.rate_night', 'w.id as id_worker')->first();
-
+            ->select('w.name', 'w.last_name', 'w.id as id_worker')->first();
         $payroll->map(function ($item) use ($worker) {
             [$detail_bonus, $reports, $total_hours, $regular_hours, $extra_hours, $night_hours, $overtime_night_hours
                 , $period_regular, $night, $overtime_regular, $overtime_night, $bon, $desc, $net_pay, $ncdor
-                , $subtotal, $gross_pay] =
+                , $subtotal, $gross_pay,$rate,$rate_night] =
                 $this->calcEmpleado($item->id, $item->type, $worker);
             $item->net_pay = $net_pay;
             $item->ncdor = $ncdor;
@@ -241,10 +240,10 @@ class PayrollController extends Controller
 
     }
 
-    private function calcPayroll($payroll)
+    public function calcPayroll($payroll)
     {
         $empleados = DB::table('report')->where('id_payroll', '=', $payroll->id)
-            ->select('worker.name', 'worker.last_name', 'worker.salary as rate', 'worker.rate_night', 'worker.id as id_worker')
+            ->select('worker.name', 'worker.last_name','worker.id as id_worker')
             ->join('worker', 'worker.id', '=', 'report.id_worker')->groupBy('id_worker')->get();
         $payroll->net_pay = 0;
         $payroll->ncdor = 0;
@@ -260,7 +259,7 @@ class PayrollController extends Controller
     private function mapEmpleado($empleados, $payroll)
     {
         $empleados->map(function ($item) use ($payroll) {
-            [$detail_bonus, $reports, $total_hours, $regular_hours, $extra_hours, $night_hours, $overtime_night_hours, $period_regular, $night, $overtime_regular, $overtime_night, $bon, $desc, $net_pay, $ncdor, $subtotal, $gross_pay] = $this->calcEmpleado($payroll->id, $payroll->type, $item);
+            [$detail_bonus, $reports, $total_hours, $regular_hours, $extra_hours, $night_hours, $overtime_night_hours, $period_regular, $night, $overtime_regular, $overtime_night, $bon, $desc, $net_pay, $ncdor, $subtotal, $gross_pay,$rate,$rate_night] = $this->calcEmpleado($payroll->id, $payroll->type, $item);
             $item->total_hours = $total_hours;
             $item->regular_hours = $regular_hours;
             $item->extra_hours = $extra_hours;
@@ -274,6 +273,8 @@ class PayrollController extends Controller
             $item->total_overtime_night = $overtime_night;
             $item->net_pay = $net_pay;
             $item->ncdor = $ncdor;
+            $item->rate =$rate;
+            $item->rate_night = $rate_night;
             $payroll->net_pay += $item->net_pay;
             $payroll->bon += $bon;
             $payroll->desc += $desc;
@@ -299,24 +300,27 @@ class PayrollController extends Controller
         $regular_hours = $reports->sum('regular');
         $extra_hours = $reports->sum('extra');
         $night_hours = $reports->sum('night');
+        $rate = $reports->first()->rate;
+        $rate_night = $reports->first()->rate_night;
+
         if ($type == 'D') {
             $overtime_night = 0;
             $overtime_night_hours = 0;
-            $night = (($item->rate * ($bonusPer->firstWhere('name', '=', 'Night hours')->amount / 100)) + $item->rate) * $night_hours;
+            $night = (($rate * ($bonusPer->firstWhere('name', '=', 'Night hours')->amount / 100)) + $rate) * $night_hours;
         } else {
             $overtime_night_hours = $reports->sum('overtime_night');
-            $overtime_night = (($item->rate_night * ($bonusPer->firstWhere('name', '=', 'Overtime night')->amount / 100)) + $item->rate_night) * $overtime_night_hours;
-            $night = (($item->rate_night * ($bonusPer->firstWhere('name', '=', 'Night hours')->amount / 100)) + $item->rate_night) * $night_hours;
+            $overtime_night = (($rate_night * ($bonusPer->firstWhere('name', '=', 'Overtime night')->amount / 100)) + $rate_night) * $overtime_night_hours;
+            $night = (($rate_night * ($bonusPer->firstWhere('name', '=', 'Night hours')->amount / 100)) + $rate_night) * $night_hours;
         }
         $total_hours = $regular_hours + $extra_hours + $night_hours + $overtime_night_hours;
         [$bon, $desc, $detail_bonus] = $this->getBon($payroll, $item->id_worker);
-        $period_regular = $item->rate * $total_hours;
-        $overtime_regular = (($item->rate * ($bonusPer->firstWhere('name', '=', 'Overtime Hours')->amount / 100)) + $item->rate) * $extra_hours;
+        $period_regular = $rate * $total_hours;
+        $overtime_regular = (($rate * ($bonusPer->firstWhere('name', '=', 'Overtime Hours')->amount / 100)) + $rate) * $extra_hours;
         $net_pay = $period_regular + $night + $overtime_regular + $overtime_night;
         $subtotal = $net_pay + $bon;
         $ncdor = $net_pay * ($bonusPer->firstWhere('name', '=', 'NCDOR')->amount / 100);
         $gross_pay = $subtotal - $ncdor - $desc;
-        return [$detail_bonus, $reports, $total_hours, $regular_hours, $extra_hours, $night_hours, $overtime_night_hours, $period_regular, $night, $overtime_regular, $overtime_night, $bon, $desc, $net_pay, $ncdor, $subtotal, $gross_pay];
+        return [$detail_bonus, $reports, $total_hours, $regular_hours, $extra_hours, $night_hours, $overtime_night_hours, $period_regular, $night, $overtime_regular, $overtime_night, $bon, $desc, $net_pay, $ncdor, $subtotal, $gross_pay,$rate,$rate_night];
     }
 
     private function getBon($payroll, $worker)

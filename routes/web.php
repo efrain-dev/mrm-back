@@ -42,7 +42,8 @@ $router->group(['prefix' => 'api', 'middleware' => 'auth'], function () use ($ro
         $router->post('', 'Catalogos\WorkerController@store');
         $router->put('/{id}', 'Catalogos\WorkerController@update');
         $router->delete('/{id}/delete', 'Catalogos\WorkerController@destroy');
-        $router->get('/send-link', 'Catalogos\WorkerController@sendLinks');
+        $router->get('/send-link', 'ReportController@sendLinks');
+        $router->get('/pay-worker', 'ReportController@getPFDWorker');
 
     });
     $router->group(['prefix' => 'payroll'], function () use ($router) {
@@ -53,7 +54,7 @@ $router->group(['prefix' => 'api', 'middleware' => 'auth'], function () use ($ro
         $router->get('/get', 'Catalogos\PayrollController@showPayroll');
         $router->get('/year', 'Catalogos\PayrollController@getPayrollsApi');
         $router->get('/worker', 'Catalogos\PayrollController@getWorkerApi');
-
+        $router->get('/pdf', 'ReportController@getPDFPayroll');
     });
     $router->group(['prefix' => 'detail'], function () use ($router) {
         $router->get('', 'Catalogos\DetailController@getReport');
@@ -73,8 +74,7 @@ $router->group(['prefix' => 'api', 'middleware' => 'auth'], function () use ($ro
         $router->get('', 'Catalogos\ConfigController@index');
         $router->put('', 'Catalogos\ConfigController@update');
     });
+
 });
-$router->group(['prefix' => 'api/report'], function () use ($router) {
-    $router->get('/pay-worker', 'ReportController@getPFDWorker');
-});
+
 

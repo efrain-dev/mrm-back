@@ -147,7 +147,7 @@
             <th style="width: 180px" >Date</th>
             <th >Regular hours</th>
             <th >Night hours</th>
-            <th >Overtime hours</th>
+            <th >Overtime night hours</th>
             <th >Night overtime </th>
             <th >Total</th>
         </tr>
