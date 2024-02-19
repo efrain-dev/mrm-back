@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Catalogos\PayrollController;
 
-use App\Models\Payroll;
+use App\Models\Config;
 use App\Models\Worker;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -73,9 +73,10 @@ class ReportController extends Controller
 
     public function sendMail($pdf, $name, $mail)
     {
-        $data['email'] = $mail;
-        $data['title'] = 'Details of Your Pay Statement';
-        $data['body'] = 'Report ' . ' ' . $name;
+        $config = Config::find(1);
+        $data['email'] =$mail;
+        $data['title'] = $config->title_pay;
+        $data['body'] =  $config->pay;
         Mail::send('partial.mail', $data, function ($message) use ($data, $pdf, $name) {
             $message->to($data["email"], $data["email"])
                 ->subject($data["title"])

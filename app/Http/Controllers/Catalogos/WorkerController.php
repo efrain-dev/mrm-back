@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Catalogos;
 
 use App\Http\Controllers\Controller;
+use App\Models\Config;
+use App\Models\Link;
 use App\Models\Worker;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -11,6 +13,37 @@ use Illuminate\Support\Facades\Mail;
 
 class WorkerController extends Controller
 {
+
+    public function sendLinks(Request $request)
+    {
+        $this->validate($request, [
+            'worker' => 'required',
+        ]);
+        try {
+            $worker = Worker::find($request->get('worker'));
+            $config = Config::find(1);
+//        $data['email'] =$worker->email;
+            $data['email'] ='efraindeleon12@outlook.com';
+            $data['title'] = $config->title_videos;
+            $data['body'] = $config->videos;
+            $data['name'] =  $worker->name . ' '. $worker->last_name;
+            $data['link'] = Link::all();
+            Mail::send('partial.link', $data, function ($message) use ($data) {
+                $message->to($data["email"], $data["email"])
+                    ->subject($data["title"]);
+            });
+            return response()->json([
+                'status' => 1,
+                'message' => 'Email successfully send'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 0,
+                'message' => 'An exception has occurred' . $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function index(Request $request)
     {
         [$hire, $birthdate, $filter, $active] = $this->getDates($request);
@@ -166,20 +199,6 @@ class WorkerController extends Controller
                 'message' => 'An exception has occurred' . $e->getMessage()
             ], 500);
         }
-    }
-
-    public function sendMail()
-    {
-        $data['email'] = 'efraindeleon12@outlook.com';
-        $data['title'] = 'Report LastPay';
-
-
-        //        Mail::send('partial.mail', $data, function ($message) use ($data, $pdf, $name) {
-//            $message->to($data["email"], $data["email"])
-//                ->subject($data["title"])
-//                ->attachData($pdf->output(), $name);
-//        });
-
     }
 
 }

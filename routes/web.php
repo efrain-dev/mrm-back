@@ -42,7 +42,7 @@ $router->group(['prefix' => 'api', 'middleware' => 'auth'], function () use ($ro
         $router->post('', 'Catalogos\WorkerController@store');
         $router->put('/{id}', 'Catalogos\WorkerController@update');
         $router->delete('/{id}/delete', 'Catalogos\WorkerController@destroy');
-
+        $router->get('/send-link', 'Catalogos\WorkerController@sendLinks');
 
     });
     $router->group(['prefix' => 'payroll'], function () use ($router) {

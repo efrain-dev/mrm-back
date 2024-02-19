@@ -31,13 +31,9 @@ class GlobalSeeder extends Seeder
             ]
         );
         DB::table('config')->insert([
-                ['id'=>1, 'title_videos'=>' Important Links for Your Review' , 'videos' => 'I hope this message finds you well. I am writing to share
-                some important links that I believe will be beneficial for your current projects and ongoing
-                professional development. Please take a moment to review the following resources:',
-                  'title_pay'=>' Details of Your Pay Statement' ,
-                'pay'=>"I hope this message finds you well. I am reaching out to provide you with detailed
-                    information regarding the deductions, bonuses, and the total amount received in your
-                     recent pay statement."
+                ['id'=>1, 'title_videos'=>'Important Links for Your Review' , 'videos' => 'I hope this message finds you well. I am writing to share some important links that I believe will be beneficial for your current projects and ongoing professional development. Please take a moment to review the following resources:',
+                  'title_pay'=>'Details of Your Pay Statement' ,
+                'pay'=>"I hope this message finds you well. I am reaching out to provide you with detailed information regarding the deductions, bonuses, and the total amount received in your recent pay statement."
                 ],
             ]
         );
