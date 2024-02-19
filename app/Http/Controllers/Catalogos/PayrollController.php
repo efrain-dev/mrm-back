@@ -18,10 +18,10 @@ class PayrollController extends Controller
     public function index(Request $request)
     {
         $this->validate($request, [
-            'from'=>'nullable',
-            'to'=>'nullable',
-            'filter'=>'nullable',
-            'type'=>'nullable',
+            'from' => 'nullable',
+            'to' => 'nullable',
+            'filter' => 'nullable',
+            'type' => 'nullable',
         ]);
         $filter = $request->get('filter');
         $show = $request->get('type');
@@ -48,11 +48,40 @@ class PayrollController extends Controller
         return response()->json($payroll);
     }
 
+    public function getOrder(Request $request)
+    {
+        $this->validate($request, [
+            'filter' => 'nullable',
+        ]);
+        $filter = $request->get('filter');
+        $payroll = DB::table('payroll as p')
+            ->where(function ($query) use ($filter) {
+                $query = $query->orWhere('p.id', 'like', '%' . $filter . '%');
+            })->orderBy('p.start', 'DESC')->where('p.status', '=', "O")->take(10)->get();
+        return response()->json($payroll);
+    }
+
+    public function changeStatus(Request $request, $id)
+    {
+        try {
+            Payroll::find($id)->update(['status' => 'C']);
+            return response()->json([
+                'status' => 1,
+                'message' => 'Successfully updated payroll'
+            ]);
+        } catch (\Illuminate\Database\QueryException $e) {
+            return response()->json([
+                'status' => 0,
+                'message' => 'An exception has occurred' . $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function getPayrollsApi(Request $request)
     {
         $this->validate($request, [
-            'from'=>'nullable',
-            'to'=>'nullable'
+            'from' => 'nullable',
+            'to' => 'nullable'
         ]);
         [$from, $to] = $this->getDates($request);
         [$payroll, $from, $to, $net_pay, $ncdor, $total, $gross_pay, $desc, $bon] = $this->getPayrolls($from, $to);
@@ -78,13 +107,13 @@ class PayrollController extends Controller
             'worker' => 'required',
             'last' => 'required',
             'payroll' => 'nullable',
-            'from'=>'nullable',
-            'to'=>'nullable'
+            'from' => 'nullable',
+            'to' => 'nullable'
         ]);
         $worker = $request->get('worker');
         $last = $request->get('last');
         $payroll = $request->get('payroll');
-        $result = $this->getPayrollsWorker($from, $to, $worker,$payroll,$last);
+        $result = $this->getPayrollsWorker($from, $to, $worker, $payroll, $last);
         return response()->json($result);
     }
 

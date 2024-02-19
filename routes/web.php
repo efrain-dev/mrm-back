@@ -44,6 +44,8 @@ $router->group(['prefix' => 'api', 'middleware' => 'auth'], function () use ($ro
     });
     $router->group(['prefix' => 'payroll'], function () use ($router) {
         $router->get('', 'Catalogos\PayrollController@index');
+        $router->get('/get-order', 'Catalogos\PayrollController@getOrder');
+        $router->put('/status/{id}', 'Catalogos\PayrollController@changeStatus');
         $router->post('', 'Catalogos\PayrollController@newPayroll');
         $router->get('/get', 'Catalogos\PayrollController@showPayroll');
         $router->get('/year', 'Catalogos\PayrollController@getPayrollsApi');

@@ -19,6 +19,7 @@ class CreatePayrollTable extends Migration
             $table->date('end');
             $table->string('description');
             $table->string('type',1)->comment('Lo tipos se difine de d de day y n de nightly');
+            $table->string('status',1)->default('O');
             $table->integer('users_id')->unsigned();
             $table->foreign('users_id','fk_users_payroll')->references('id')->on('users');
             $table->timestamps();
