@@ -23,21 +23,42 @@ class GlobalSeeder extends Seeder
             ]
         );
         DB::table('detail_bonus')->insert([
-                ['id_bonus' => 1, 'calc'=>2,'amount'=>'4','date'=>'15/01/2000'],
-                ['id_bonus' => 2, 'calc'=>2,'amount'=>'25','date'=>'15/01/2000'],
-                ['id_bonus' => 3, 'calc'=>2,'amount'=>'50','date'=>'15/01/2000'],
-                ['id_bonus' => 4, 'calc'=>2,'amount'=>'50','date'=>'15/01/2000'],
+                ['id_bonus' => 1, 'calc'=>2,'amount'=>'4','date'=>Carbon::createFromFormat('Y-m-d', '2023-01-15')],
+                ['id_bonus' => 2, 'calc'=>2,'amount'=>'25','date'=>Carbon::createFromFormat('Y-m-d', '2023-01-15')],
+                ['id_bonus' => 3, 'calc'=>2,'amount'=>'50','date'=>Carbon::createFromFormat('Y-m-d', '2023-01-15')],
+                ['id_bonus' => 4, 'calc'=>2,'amount'=>'50','date'=>Carbon::createFromFormat('Y-m-d', '2023-01-15')],
 
             ]
         );
+        DB::table('config')->insert([
+                ['id'=>1, 'title_videos'=>' Important Links for Your Review' , 'videos' => 'I hope this message finds you well. I am writing to share
+                some important links that I believe will be beneficial for your current projects and ongoing
+                professional development. Please take a moment to review the following resources:',
+                  'title_pay'=>' Details of Your Pay Statement' ,
+                'pay'=>"I hope this message finds you well. I am reaching out to provide you with detailed
+                    information regarding the deductions, bonuses, and the total amount received in your
+                     recent pay statement."
+                ],
+            ]
+        );
+
+        DB::table('link')->insert([
+                ['name' => "https://www.youtube.com/watch?v=JxS5E-kZc2s"],
+                ['name' => "https://www.youtube.com/watch?v=u0XHVssfsYM"],
+            ]
+        );
+
+
         DB::table('bonus')->insert([
                 ['name' => 'Descuento','type'=>'D','permanent'=>false],
                 ['name' => 'Bonificacion','type'=>'B','permanent'=>false],
             ]
         );
+
+
         DB::table('detail_bonus')->insert([
-                ['id_bonus' => 5, 'calc'=>1,'amount'=>'100','date'=>'15/01/2000'],
-                ['id_bonus' => 6, 'calc'=>1,'amount'=>'50','date'=>'15/01/2000'],
+                ['id_bonus' => 5, 'calc'=>1,'amount'=>'100','date'=>Carbon::createFromFormat('Y-m-d', '2023-01-15')],
+                ['id_bonus' => 6, 'calc'=>1,'amount'=>'50','date'=>Carbon::createFromFormat('Y-m-d', '2023-01-15')],
 
             ]
         );

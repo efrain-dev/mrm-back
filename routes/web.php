@@ -18,7 +18,10 @@
 $router->get('/', function () use ($router) {
     return $router->app->version();
 });
-
+$router->get('/logo', function () use ($router) {
+    $path    =   app()->basePath('public') . '/asset/Logo.png';
+    return $path;
+});
 $router->group(['prefix' => 'api'], function () use ($router) {
     $router->post('login', 'LumenAuthController@login');
     $router->post('logout', 'LumenAuthController@logout');
@@ -59,9 +62,19 @@ $router->group(['prefix' => 'api', 'middleware' => 'auth'], function () use ($ro
         $router->delete('/{id}/delete', 'Catalogos\DetailController@deleteReport');
 
     });
-    $router->group(['prefix' => 'report'], function () use ($router) {
-        $router->get('/pdf-worker', 'ReportController@getPFDWorker');
+    $router->group(['prefix' => 'link'], function () use ($router) {
+        $router->get('', 'Catalogos\LinkController@index');
+        $router->get('/get/{id}', 'Catalogos\LinkController@show');
+        $router->post('', 'Catalogos\LinkController@store');
+        $router->put('/{id}', 'Catalogos\LinkController@update');
+        $router->delete('/{id}/delete', 'Catalogos\LinkController@destroy');
     });
-    $router->post('/send', 'Catalogos\WorkerController@sendMail');
-
+    $router->group(['prefix' => 'config'], function () use ($router) {
+        $router->get('', 'Catalogos\ConfigController@index');
+        $router->put('', 'Catalogos\ConfigController@update');
+    });
 });
+$router->group(['prefix' => 'api/report'], function () use ($router) {
+    $router->get('/pay-worker', 'ReportController@getPFDWorker');
+});
+

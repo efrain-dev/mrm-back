@@ -178,7 +178,13 @@ class PayrollController extends Controller
             $item->desc = $desc;
             $item->bon = $bon;
             $item->detail_bonus = $detail_bonus;
-            $item->reports = $reports;
+            $item->total_hours = $total_hours;
+            $item->regular_hours = $regular_hours;
+            $item->extra_hours = $extra_hours;
+            $item->night_hours = $night_hours;
+            $item->overtime_night_hours = $overtime_night_hours;
+            $item->period_regular = $period_regular;
+            $item->night = $night;
         });
         return [
             'net_pay' => $payroll->sum('net_pay'),
@@ -187,6 +193,13 @@ class PayrollController extends Controller
             'gross_pay' => $payroll->sum('gross_pay'),
             'desc' => $payroll->sum('desc'),
             'bon' => $payroll->sum('bon'),
+            'total_hours'=>$payroll->sum('total_hours'),
+            'regular_hours'=>$payroll->sum('regular_hours'),
+            'extra_hours'=>$payroll->sum('extra_hours'),
+            'night_hours'=>$payroll->sum('night_hours'),
+            'overtime_night_hours'=>$payroll->sum('overtime_night_hours'),
+            'period_regular'=>$payroll->sum('period_regular'),
+            'night'=>$payroll->sum('night'),
             'from' => $from,
             'to' => $to,
             'worker' => $worker,

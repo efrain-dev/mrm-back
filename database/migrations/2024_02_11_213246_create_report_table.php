@@ -25,7 +25,6 @@ class CreateReportTable extends Migration
             $table->foreign('id_payroll','fk_report_payroll')->references('id')->on('payroll');
             $table->integer('id_worker')->unsigned();
             $table->foreign('id_worker','fk_report_worker')->references('id')->on('worker');
-            $table->timestamps();
         });
     }
 

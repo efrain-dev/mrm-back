@@ -22,7 +22,6 @@ class CreatePayrollTable extends Migration
             $table->string('status',1)->default('O');
             $table->integer('users_id')->unsigned();
             $table->foreign('users_id','fk_users_payroll')->references('id')->on('users');
-            $table->timestamps();
 
         });
     }

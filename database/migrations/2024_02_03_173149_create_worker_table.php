@@ -27,7 +27,6 @@ return new class extends Migration
             $table->string('cel')->nullable();
             $table->boolean('active')->default(true);
 
-            $table->timestamps();
         });
     }
 

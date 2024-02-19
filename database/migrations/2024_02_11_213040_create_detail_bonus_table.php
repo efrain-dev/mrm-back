@@ -22,7 +22,6 @@ class CreateDetailBonusTable extends Migration
             $table->date('date');
             $table->boolean('general')->default(true);
             $table->boolean('active')->default(true);
-            $table->timestamps();
         });
     }
 

@@ -6,10 +6,8 @@
 <body>
 
 <h3>{{ $title }}</h3>
-<p> Cuerpo</p>
-
 <p>
-    Saludos<br/>
+    Best regards,<br/>
 </p>
 </body>
 </html>
