@@ -61,7 +61,6 @@ $router->group(['prefix' => 'api', 'middleware' => 'auth'], function () use ($ro
         $router->post('', 'Catalogos\DetailController@newDetail');
         $router->get('/get', 'Catalogos\DetailController@getReport');
         $router->delete('/{id}/delete', 'Catalogos\DetailController@deleteReport');
-
     });
     $router->group(['prefix' => 'link'], function () use ($router) {
         $router->get('', 'Catalogos\LinkController@index');

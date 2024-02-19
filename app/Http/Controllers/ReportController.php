@@ -32,7 +32,6 @@ class ReportController extends Controller
             'to' => 'nullable',
             'send' => 'required',
             'download' => 'nullable'
-
         ]);
         [$from, $to] = $this->payrollController->getDates($request);
         $worker = $request->get('worker');

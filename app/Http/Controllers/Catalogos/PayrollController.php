@@ -26,7 +26,7 @@ class PayrollController extends Controller
         $filter = $request->get('filter');
         $show = $request->get('type');
         [$from, $to] = $this->getDates($request);
-        $query = DB::table('payroll as p')
+        $query = DB::table('payroll as p',)
             ->where(function ($query) use ($filter) {
                 $query = $query->orWhere('p.id', 'like', '%' . $filter . '%');
             })->whereDate("p.start", '>=', $from)->whereDate("p.end", '<=', $to);
@@ -43,7 +43,7 @@ class PayrollController extends Controller
             }
             default:
         }
-        $payroll = $query->get();
+        $payroll = $query->select('p.*','p.id as no')->get();
         $payroll = $this->mapPayroll($payroll);
         return response()->json($payroll);
     }
@@ -57,7 +57,7 @@ class PayrollController extends Controller
         $payroll = DB::table('payroll as p')
             ->where(function ($query) use ($filter) {
                 $query = $query->orWhere('p.id', 'like', '%' . $filter . '%');
-            })->orderBy('p.start', 'DESC')->where('p.status', '=', "O")->take(10)->get();
+            })->orderBy('p.start', 'DESC')->where('p.status', '=', "O")->select('p.*','p.id as no')->take(10)->get();
         return response()->json($payroll);
     }
 
@@ -119,7 +119,7 @@ class PayrollController extends Controller
 
     public function getPayrolls($from, $to)
     {
-        $payroll = DB::table('payroll as p')
+        $payroll = DB::table('payroll as p')->select('p.*','p.id as no')
             ->whereDate("p.start", '>=', $from)->whereDate("p.end", '<=', $to)
             ->get();
         $payroll = $this->mapPayroll($payroll);
