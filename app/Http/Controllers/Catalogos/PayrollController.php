@@ -383,5 +383,21 @@ class PayrollController extends Controller
 
     }
 
+    public function destroy($id)
+    {
+        try {
+            Payroll::find($id);
 
+
+            return response()->json([
+                'status' => 1,
+                'message' => 'Worker successfully removed'
+            ]);
+        } catch (\Illuminate\Database\QueryException $e) {
+            return response()->json([
+                'status' => 0,
+                'message' => 'An exception has occurred' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

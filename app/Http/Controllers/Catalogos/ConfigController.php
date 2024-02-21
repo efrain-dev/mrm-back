@@ -15,7 +15,7 @@ class ConfigController extends Controller
 {
     public function index(Request $request)
     {
-        $config = DB::table('config')->select('pay','title_pay' ,'title_videos','videos')->first();
+        $config = DB::table('config')->select('pay', 'title_pay', 'title_videos', 'videos')->first();
         return response()->json($config);
     }
 
@@ -46,5 +46,72 @@ class ConfigController extends Controller
         }
 
     }
-
+    public function createCarpetas()
+    {
+        try {
+            $carpeta = getenv('USERPROFILE') . '\Downloads\BACKUPMRM';
+            $carpeta1 = getenv('USERPROFILE') . '\Downloads\BACKUPMRM\DOWN';
+            $carpeta2 = getenv('USERPROFILE') . '\Downloads\BACKUPMRM\UP';
+            if (!file_exists($carpeta)) {
+                mkdir($carpeta, 0777, true);
+            }
+            if (!file_exists($carpeta1)) {
+                mkdir($carpeta1, 0777, true);
+            }
+            if (!file_exists($carpeta2)) {
+                mkdir($carpeta2, 0777, true);
+            }
+            return response()->json([
+                'status' => 1,
+                'message' => 'Successfully '
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 0,
+                'message' => 'An exception has occurred' . $e->getMessage()
+            ], 500);
+        }
+    }
+    public function copyBD()
+    {
+        $archivoOriginal = base_path('database/database.sqlite');
+        $carpeta = getenv('USERPROFILE') . '\Downloads\BACKUPMRM\DOWN';
+        if (!file_exists($carpeta)) {
+            mkdir($carpeta, 0777, true);
+        }
+        $destino = getenv('USERPROFILE') . '\Downloads\BACKUPMRM\DOWN\database.sqlite';
+        try {
+            copy($archivoOriginal, $destino);
+            return response()->json([
+                'status' => 1,
+                'message' => 'Successfully copy backup in Download'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 0,
+                'message' => 'An exception has occurred' . $e->getMessage()
+            ], 500);
+        }
+    }
+    public function upBD()
+    {
+        $archivoOriginal = getenv('USERPROFILE') . '\Downloads\BACKUPMRM\UP\database.sqlite';
+        $carpeta = getenv('USERPROFILE') . '\Downloads\BACKUPMRM\UP';
+        if (!file_exists($carpeta)) {
+            mkdir($carpeta, 0777, true);
+        }
+        $destino = base_path('database/database.sqlite');
+        try {
+            copy($archivoOriginal, $destino);
+            return response()->json([
+                'status' => 1,
+                'message' => 'Successfully copy backup in Download'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 0,
+                'message' => 'An exception has occurred' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

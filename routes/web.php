@@ -55,6 +55,8 @@ $router->group(['prefix' => 'api', 'middleware' => 'auth'], function () use ($ro
         $router->get('/year', 'Catalogos\PayrollController@getPayrollsApi');
         $router->get('/worker', 'Catalogos\PayrollController@getWorkerApi');
         $router->get('/pdf', 'ReportController@getPDFPayroll');
+        $router->delete('/{id}/delete', 'Catalogos\PayrollController@destroy');
+
     });
     $router->group(['prefix' => 'detail'], function () use ($router) {
         $router->get('', 'Catalogos\DetailController@getReport');
@@ -73,7 +75,10 @@ $router->group(['prefix' => 'api', 'middleware' => 'auth'], function () use ($ro
         $router->get('', 'Catalogos\ConfigController@index');
         $router->put('', 'Catalogos\ConfigController@update');
     });
-
+    $router->get('/copy', 'Catalogos\ConfigController@copyBD');
+    $router->get('/up', 'Catalogos\ConfigController@upBD');
+    $router->get('/create', 'Catalogos\ConfigController@createCarpetas');
 });
+
 
 

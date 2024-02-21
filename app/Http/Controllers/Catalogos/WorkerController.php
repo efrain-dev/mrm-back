@@ -186,8 +186,7 @@ class WorkerController extends Controller
     public function destroy($id)
     {
         try {
-            $worker = Worker::find($id);
-            $worker->delete();
+            Worker::find($id)->udpate(['status'=>0]);
             return response()->json([
                 'status' => 1,
                 'message' => 'Worker successfully removed'
