@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Bonus;
 use App\Models\BonusDetail;
 use App\Models\Payroll;
+use App\Models\PayrollBonus;
+use App\Models\Report;
 use App\Models\Worker;
 use App\Models\WorkerBonus;
 use Exception;
@@ -43,7 +45,7 @@ class PayrollController extends Controller
             }
             default:
         }
-        $payroll = $query->select('p.*','p.id as no')->get();
+        $payroll = $query->select('p.*', 'p.id as no')->get();
         $payroll = $this->mapPayroll($payroll);
         return response()->json($payroll);
     }
@@ -57,7 +59,7 @@ class PayrollController extends Controller
         $payroll = DB::table('payroll as p')
             ->where(function ($query) use ($filter) {
                 $query = $query->orWhere('p.id', 'like', '%' . $filter . '%');
-            })->orderBy('p.start', 'DESC')->where('p.status', '=', "O")->select('p.*','p.id as no')->take(10)->get();
+            })->orderBy('p.start', 'DESC')->where('p.status', '=', "O")->select('p.*', 'p.id as no')->take(10)->get();
         return response()->json($payroll);
     }
 
@@ -119,7 +121,7 @@ class PayrollController extends Controller
 
     public function getPayrolls($from, $to)
     {
-        $payroll = DB::table('payroll as p')->select('p.*','p.id as no')
+        $payroll = DB::table('payroll as p')->select('p.*', 'p.id as no')
             ->whereDate("p.start", '>=', $from)->whereDate("p.end", '<=', $to)
             ->get();
         $payroll = $this->mapPayroll($payroll);
@@ -169,7 +171,7 @@ class PayrollController extends Controller
         $payroll->map(function ($item) use ($worker) {
             [$detail_bonus, $reports, $total_hours, $regular_hours, $extra_hours, $night_hours, $overtime_night_hours
                 , $period_regular, $night, $overtime_regular, $overtime_night, $bon, $desc, $net_pay, $ncdor
-                , $subtotal, $gross_pay,$rate,$rate_night] =
+                , $subtotal, $gross_pay, $rate, $rate_night] =
                 $this->calcEmpleado($item->id, $item->type, $worker);
             $item->net_pay = $net_pay;
             $item->ncdor = $ncdor;
@@ -192,13 +194,13 @@ class PayrollController extends Controller
             'gross_pay' => $payroll->sum('gross_pay'),
             'desc' => $payroll->sum('desc'),
             'bon' => $payroll->sum('bon'),
-            'total_hours'=>$payroll->sum('total_hours'),
-            'regular_hours'=>$payroll->sum('regular_hours'),
-            'extra_hours'=>$payroll->sum('extra_hours'),
-            'night_hours'=>$payroll->sum('night_hours'),
-            'overtime_night_hours'=>$payroll->sum('overtime_night_hours'),
-            'period_regular'=>$payroll->sum('period_regular'),
-            'night'=>$payroll->sum('night'),
+            'total_hours' => $payroll->sum('total_hours'),
+            'regular_hours' => $payroll->sum('regular_hours'),
+            'extra_hours' => $payroll->sum('extra_hours'),
+            'night_hours' => $payroll->sum('night_hours'),
+            'overtime_night_hours' => $payroll->sum('overtime_night_hours'),
+            'period_regular' => $payroll->sum('period_regular'),
+            'night' => $payroll->sum('night'),
             'from' => $from,
             'to' => $to,
             'worker' => $worker,
@@ -243,7 +245,7 @@ class PayrollController extends Controller
     public function calcPayroll($payroll)
     {
         $empleados = DB::table('report')->where('id_payroll', '=', $payroll->id)
-            ->select('worker.name', 'worker.last_name','worker.id as id_worker')
+            ->select('worker.name', 'worker.last_name', 'worker.id as id_worker')
             ->join('worker', 'worker.id', '=', 'report.id_worker')->groupBy('id_worker')->get();
         $payroll->net_pay = 0;
         $payroll->ncdor = 0;
@@ -259,7 +261,7 @@ class PayrollController extends Controller
     private function mapEmpleado($empleados, $payroll)
     {
         $empleados->map(function ($item) use ($payroll) {
-            [$detail_bonus, $reports, $total_hours, $regular_hours, $extra_hours, $night_hours, $overtime_night_hours, $period_regular, $night, $overtime_regular, $overtime_night, $bon, $desc, $net_pay, $ncdor, $subtotal, $gross_pay,$rate,$rate_night] = $this->calcEmpleado($payroll->id, $payroll->type, $item);
+            [$detail_bonus, $reports, $total_hours, $regular_hours, $extra_hours, $night_hours, $overtime_night_hours, $period_regular, $night, $overtime_regular, $overtime_night, $bon, $desc, $net_pay, $ncdor, $subtotal, $gross_pay, $rate, $rate_night] = $this->calcEmpleado($payroll->id, $payroll->type, $item);
             $item->total_hours = $total_hours;
             $item->regular_hours = $regular_hours;
             $item->extra_hours = $extra_hours;
@@ -273,7 +275,7 @@ class PayrollController extends Controller
             $item->total_overtime_night = $overtime_night;
             $item->net_pay = $net_pay;
             $item->ncdor = $ncdor;
-            $item->rate =$rate;
+            $item->rate = $rate;
             $item->rate_night = $rate_night;
             $payroll->net_pay += $item->net_pay;
             $payroll->bon += $bon;
@@ -320,7 +322,7 @@ class PayrollController extends Controller
         $subtotal = $net_pay + $bon;
         $ncdor = $net_pay * ($bonusPer->firstWhere('name', '=', 'NCDOR')->amount / 100);
         $gross_pay = $subtotal - $ncdor - $desc;
-        return [$detail_bonus, $reports, $total_hours, $regular_hours, $extra_hours, $night_hours, $overtime_night_hours, $period_regular, $night, $overtime_regular, $overtime_night, $bon, $desc, $net_pay, $ncdor, $subtotal, $gross_pay,$rate,$rate_night];
+        return [$detail_bonus, $reports, $total_hours, $regular_hours, $extra_hours, $night_hours, $overtime_night_hours, $period_regular, $night, $overtime_regular, $overtime_night, $bon, $desc, $net_pay, $ncdor, $subtotal, $gross_pay, $rate, $rate_night];
     }
 
     private function getBon($payroll, $worker)
@@ -386,18 +388,33 @@ class PayrollController extends Controller
     public function destroy($id)
     {
         try {
-            Payroll::find($id);
+            $payroll = Payroll::find($id);
+            if ($payroll->status == 'O') {
+                $message = DB::transaction(function () use ($id) {
+                    $detail = DB::table('bonus_payroll')
+                        ->where('id_payroll', $id)->get();
+                    foreach ($detail as $item) {
+                        PayrollBonus::find($item->id)->delete();
+                    }
+                    $reports = DB::table('report')->where('id_payroll', $id)->get();
+                    foreach ($reports as $item) {
+                        Report::find($item->id)->delete();
+                    }
+                    return [
+                        'status' => 1,
+                        'message' => 'Successfully deleted payroll'
+                    ];
+                });
+            } else {
+                $message = [
+                    'status' => 0,
+                    'message' => 'The Payroll is closed; it cannot be deleted.'
+                ];
+            }
 
-
-            return response()->json([
-                'status' => 1,
-                'message' => 'Worker successfully removed'
-            ]);
-        } catch (\Illuminate\Database\QueryException $e) {
-            return response()->json([
-                'status' => 0,
-                'message' => 'An exception has occurred' . $e->getMessage()
-            ], 500);
+        } catch (Exception $e) {
+            $message = ['status' => 'error', 'message' => $e->getMessage(), 500];
         }
+        return response()->json($message);
     }
 }

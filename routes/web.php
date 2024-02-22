@@ -35,7 +35,7 @@ $router->group(['prefix' => 'api', 'middleware' => 'auth'], function () use ($ro
         $router->post('', 'Catalogos\BonusController@newBonus');
         $router->post('/new-bonus', 'Catalogos\BonusController@newDetailBonus');
         $router->post('/edit', 'Catalogos\BonusController@editDetailBonus');
-        $router->delete('/{id}/delete', 'Catalogos\BonusController@deleteBonus');
+        $router->delete('/delete', 'Catalogos\BonusController@deleteBonus');
     });
     $router->group(['prefix' => 'worker'], function () use ($router) {
         $router->get('', 'Catalogos\WorkerController@index');

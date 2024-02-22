@@ -15,9 +15,9 @@ use Illuminate\Support\Facades\DB;
 
 class BonusController extends Controller
 {
-    public function index(Request $request, $type =0)
+    public function index(Request $request, $type = 0)
     {
-        $query = DB::table('bonus')->join('detail_bonus', 'detail_bonus.id_bonus', '=', 'bonus.id')->select('detail_bonus.*','bonus.name');
+        $query = DB::table('bonus')->join('detail_bonus', 'detail_bonus.id_bonus', '=', 'bonus.id')->select('detail_bonus.*', 'bonus.name');
         if ($type) {
             $query = $query->where('permanent', '=', true)->where('active', '=', 1);
         } else {
@@ -38,8 +38,8 @@ class BonusController extends Controller
         $query = DB::table('bonus_payroll')
             ->join('detail_bonus', 'detail_bonus.id', '=', 'bonus_payroll.id_detail_bonus')
             ->join('bonus', 'bonus.id', '=', 'detail_bonus.id_bonus')
-            ->where('bonus_payroll.id_payroll',$request->get('payroll'))
-            ->where('bonus_payroll.id_worker',$request->get('worker'))
+            ->where('bonus_payroll.id_payroll', $request->get('payroll'))
+            ->where('bonus_payroll.id_worker', $request->get('worker'))
             ->select('detail_bonus.amount', 'detail_bonus.date', 'bonus_payroll.id', 'bonus.name as bonus', 'bonus.type')->get();
         return response()->json($query);
     }
@@ -118,12 +118,12 @@ class BonusController extends Controller
             $message = DB::transaction(function () use ($data) {
                 $bonus = BonusDetail::find($data['id']);
                 $bonus->update(['active' => false]);
-                BonusDetail::create( [
+                BonusDetail::create([
                     'amount' => $data['amount'],
                     'id_bonus' => $bonus->id_bonus,
                     'calc' => 2,
-                    'date' =>Carbon::now(),
-                    'permanent'=>true
+                    'date' => Carbon::now(),
+                    'permanent' => true
                 ]);
                 return [
                     'status' => 1,
@@ -136,21 +136,30 @@ class BonusController extends Controller
         return response()->json($message);
     }
 
-    public function deleteBonus(Request $request, $id)
+    public function deleteBonus(Request $request)
     {
+        $this->validate($request, [
+            'payroll' => 'required',
+            'worker' => 'required',
+            'bonus' => 'required',
+        ]);
         try {
-
-            BonusDetail::find($id)->delete();
-            return response()->json([
-                'status' => 1,
-                'message' => 'Successfully deleted bonus'
-            ]);
-        } catch (\Illuminate\Database\QueryException $e) {
-            return response()->json([
-                'status' => 0,
-                'message' => 'An exception has occurred' . $e->getMessage()
-            ], 500);
+            $message = DB::transaction(function () use ($request) {
+                $detail = DB::table('bonus_payroll')
+                    ->where('id_detail_bonus', $request->get('bonus'))
+                    ->where('id_payroll', $request->get('payroll'))
+                    ->where('id_worker', $request->get('worker'))->get();
+                foreach ($detail as $item) {
+                    PayrollBonus::find($item->id)->delete();
+                }
+                return [
+                    'status' => 1,
+                    'message' => 'Successfully deleted bonus'
+                ];
+            });
+        } catch (Exception $e) {
+            $message = ['status' => 'error', 'message' => $e->getMessage(), 500];
         }
-
+        return response()->json($message);
     }
 }
