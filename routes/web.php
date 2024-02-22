@@ -33,8 +33,7 @@ $router->group(['prefix' => 'api', 'middleware' => 'auth'], function () use ($ro
         $router->get('/get-bonus', 'Catalogos\BonusController@getBonus');
         $router->get('/type', 'Catalogos\BonusController@getType');
         $router->post('', 'Catalogos\BonusController@newBonus');
-        $router->post('/new-bonus', 'Catalogos\BonusController@newBonus');
-
+        $router->post('/new-bonus', 'Catalogos\BonusController@newDetailBonus');
         $router->post('/edit', 'Catalogos\BonusController@editDetailBonus');
         $router->delete('/{id}/delete', 'Catalogos\BonusController@deleteBonus');
     });
@@ -63,7 +62,6 @@ $router->group(['prefix' => 'api', 'middleware' => 'auth'], function () use ($ro
     $router->group(['prefix' => 'detail'], function () use ($router) {
         $router->get('', 'Catalogos\DetailController@getReport');
         $router->post('', 'Catalogos\DetailController@newDetail');
-        $router->get('/get', 'Catalogos\DetailController@getReport');
         $router->delete('/{id}/delete', 'Catalogos\DetailController@deleteReport');
     });
     $router->group(['prefix' => 'link'], function () use ($router) {
