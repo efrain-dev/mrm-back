@@ -86,7 +86,7 @@ class ReportController extends Controller
                 $pdf = $this->pdfPayrolls($result);
 
             }
-            return $pdf->stream();
+            return $pdf->download();
 
         } catch (\Exception $e) {
             return response()->json([
