@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\DB;
 
 class BonusController extends Controller
 {
-    public function index(Request $request, $type)
+    public function index(Request $request, $type =0)
     {
         $query = DB::table('bonus')->join('detail_bonus', 'detail_bonus.id_bonus', '=', 'bonus.id')->select('detail_bonus.*','bonus.name');
         if ($type) {
@@ -82,7 +82,6 @@ class BonusController extends Controller
                 'payroll' => 'required',
                 'date' => 'required',
                 'worker' => 'required',
-
             ]);
             $data = $request->all();
             $bonus = BonusDetail::create(
