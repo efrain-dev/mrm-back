@@ -212,8 +212,8 @@ class PayrollController extends Controller
     {
         $from = $request->get('from');
         $to = $request->get('to');
-        $from = $from ? Carbon::createFromFormat('Y-m-d', $from) : Carbon::now()->startOfYear()->subDay();
-        $to = $to ? Carbon::createFromFormat('Y-m-d', $to)->addDay() : Carbon::now()->addMonth()->startOfMonth();
+        $from = $from !='' ? Carbon::createFromFormat('Y-m-d', $from) : Carbon::now()->startOfYear()->subDay();
+        $to = $to !='' ? Carbon::createFromFormat('Y-m-d', $to)->addDay() : Carbon::now()->addMonth()->startOfMonth();
         return [$from, $to];
     }
 
