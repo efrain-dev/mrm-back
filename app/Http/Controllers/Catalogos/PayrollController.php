@@ -344,7 +344,7 @@ class PayrollController extends Controller
         return DB::table('bonus_payroll')->join('detail_bonus', 'detail_bonus.id', '=', 'bonus_payroll.id_detail_bonus')
             ->join('bonus', 'bonus.id', '=', 'detail_bonus.id_bonus')
             ->where('bonus_payroll.id_payroll', '=', $payroll)
-            ->where('permanent', '=', true)->where('active', '=', 1)
+            ->where('permanent', '=', true)
             ->select('detail_bonus.*', 'bonus.type', 'bonus.name')
             ->get();
 
