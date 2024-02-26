@@ -14,19 +14,20 @@ use Illuminate\Support\Facades\Mail;
 class WorkerController extends Controller
 {
 
-    public function sendLinks(Request $request)
+    public function sendEmail(Request $request)
     {
         $this->validate($request, [
             'worker' => 'required',
+            'header'=>'required',
+            'body'=>'required',
         ]);
         try {
+
             $worker = Worker::find($request->get('worker'));
-            $config = Config::find(1);
             $data['email'] = $worker->email;
-            $data['title'] = $config->title_videos;
-            $data['body'] = $config->videos;
+            $data['title'] = $request->get('header');
+            $data['body'] = $request->get('body');
             $data['name'] = $worker->name . ' ' . $worker->last_name;
-            $data['link'] = Link::all();
             Mail::send('partial.link', $data, function ($message) use ($data) {
                 $message->to($data["email"], $data["email"])
                     ->subject($data["title"]);

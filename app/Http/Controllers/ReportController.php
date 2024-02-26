@@ -10,6 +10,7 @@ use App\Models\Worker;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Mockery\Exception;
 
 
 class ReportController extends Controller
@@ -56,7 +57,38 @@ class ReportController extends Controller
                 ]);
             }
 
-        } catch (\Illuminate\Database\QueryException $e) {
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => 0,
+                'message' => 'An exception has occurred' . $e->getMessage()
+            ], 500);
+        }
+
+
+    }
+
+    public function getPFDInvoice(Request $request)
+    {
+        $this->validate($request, [
+            'worker' => 'nullable',
+            'last' => 'nullable',
+            'payroll' => 'nullable',
+            'from' => 'nullable',
+            'to' => 'nullable',
+            'send' => 'nullable',
+            'download' => 'nullable'
+        ]);
+        [$from, $to] = $this->payrollController->getDates($request);
+        $worker = $request->get('worker');
+        $payroll = $request->get('payroll');
+        $last = $request->get('last');
+        $send = $request->get('send');
+        $down = $request->get('download') ?: 1;
+        try {
+            $pdf = $this->pdfInvoice('');
+            return $pdf->download();
+
+        } catch (\Exception $e) {
             return response()->json([
                 'status' => 0,
                 'message' => 'An exception has occurred' . $e->getMessage()
@@ -99,6 +131,10 @@ class ReportController extends Controller
     {
         return PDF::setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true])->loadView('pdf.worker', compact('data'));
     }
+    public function pdfInvoice($data)
+    {
+        return PDF::setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true])->loadView('pdf.invoice', compact('data'));
+    }
     public function pdfPayroll($data)
     {
         return PDF::setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true])->loadView('pdf.payroll', compact('data'));
@@ -111,8 +147,8 @@ class ReportController extends Controller
     {
         $config = Config::find(1);
         $data['email'] =$mail;
-        $data['title'] = $config->title_pay;
-        $data['body'] =  $config->pay;
+        $data['title'] ='';
+        $data['body'] = '';
         Mail::send('partial.mail', $data, function ($message) use ($data, $pdf, $name) {
             $message->to($data["email"], $data["email"])
                 ->subject($data["title"])

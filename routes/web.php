@@ -43,7 +43,7 @@ $router->group(['prefix' => 'api', 'middleware' => 'auth'], function () use ($ro
         $router->post('', 'Catalogos\WorkerController@store');
         $router->put('/{id}', 'Catalogos\WorkerController@update');
         $router->delete('/{id}/delete', 'Catalogos\WorkerController@destroy');
-        $router->get('/send-link', 'ReportController@sendLinks');
+        $router->get('/send-email', 'ReportController@sendLinks');
         $router->get('/pay-worker', 'ReportController@getPFDWorker');
 
     });
@@ -75,6 +75,7 @@ $router->group(['prefix' => 'api', 'middleware' => 'auth'], function () use ($ro
         $router->get('', 'Catalogos\ConfigController@index');
         $router->put('', 'Catalogos\ConfigController@update');
     });
+    $router->get('/send-invoice', 'ReportController@getPFDInvoice');
     $router->get('/copy', 'Catalogos\ConfigController@copyBD');
     $router->get('/up', 'Catalogos\ConfigController@upBD');
     $router->get('/create', 'Catalogos\ConfigController@createCarpetas');
