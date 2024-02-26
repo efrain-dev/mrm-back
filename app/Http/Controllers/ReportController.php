@@ -145,7 +145,6 @@ class ReportController extends Controller
     }
     public function sendMail($pdf, $name, $mail)
     {
-        $config = Config::find(1);
         $data['email'] =$mail;
         $data['title'] ='';
         $data['body'] = '';
