@@ -116,7 +116,7 @@
             </thead>
             <tbody>
             <tr>
-                <td>{!!$data['header']['invoiceNoc']?:''!!}</td>
+                <td>{!!$data['header']['invoiceNo']?:''!!}</td>
                 <td>{!!$data['header']['terms']?:''!!}</td>
                 <td>{!!$data['header']['invoiceDate']?:''!!}</td>
                 <td>{!!$data['header']['dueDate']?:''!!}</td>
