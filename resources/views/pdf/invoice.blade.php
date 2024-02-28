@@ -182,7 +182,7 @@
     </div>
 
     <div class="footer">
-        <p>Payment: {{$data['header']['payment']}}</p>
+        <p>Payment: ${{$data['header']['payment']}}</p>
         <p>Balance due: ${{$balance}}</p>
     </div>
 </div>

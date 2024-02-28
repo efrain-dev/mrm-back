@@ -47,7 +47,16 @@ class PayrollController extends Controller
         }
         $payroll = $query->select('p.*', 'p.id as no')->get();
         $payroll = $this->mapPayroll($payroll);
-        return response()->json($payroll);
+
+        $result = ['desc' => $payroll->sum('desc') ,
+       'bon' => $payroll->sum('bon'),
+        'net_pay' => $payroll->sum('net_pay'),
+        'ncdor' => $payroll->sum('ncdor'),
+        'total' => $payroll->sum('total'),
+        'gross_pay' => $payroll->sum('gross_pay')
+        ];
+
+        return response()->json(['items'=>$payroll,'total'=>$result]);
     }
 
     public function getOrder(Request $request)
@@ -390,7 +399,7 @@ class PayrollController extends Controller
         try {
             $payroll = Payroll::find($id);
             if ($payroll->status == 'O') {
-                $message = DB::transaction(function () use ($id) {
+                $message = DB::transaction(function () use ($id,$payroll) {
                     $detail = DB::table('bonus_payroll')
                         ->where('id_payroll', $id)->get();
                     foreach ($detail as $item) {
@@ -400,6 +409,7 @@ class PayrollController extends Controller
                     foreach ($reports as $item) {
                         Report::find($item->id)->delete();
                     }
+                    $payroll->delete();
                     return [
                         'status' => 1,
                         'message' => 'Successfully deleted payroll'
