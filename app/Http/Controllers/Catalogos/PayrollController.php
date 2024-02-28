@@ -396,6 +396,7 @@ class PayrollController extends Controller
 
     public function destroy($id)
     {
+
         try {
             $payroll = Payroll::find($id);
             if ($payroll->status == 'O') {
@@ -409,7 +410,7 @@ class PayrollController extends Controller
                     foreach ($reports as $item) {
                         Report::find($item->id)->delete();
                     }
-                    $payroll->delete();
+                    Payroll::find($id)->delete();
                     return [
                         'status' => 1,
                         'message' => 'Successfully deleted payroll'

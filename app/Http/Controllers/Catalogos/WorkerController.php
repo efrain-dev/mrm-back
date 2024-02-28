@@ -18,8 +18,8 @@ class WorkerController extends Controller
     {
         $this->validate($request, [
             'worker' => 'required',
-            'header'=>'required',
-            'body'=>'required',
+            'header' => 'required',
+            'body' => 'required',
         ]);
         try {
 
@@ -92,13 +92,13 @@ class WorkerController extends Controller
         $filter = $request->get('filter') ?: '';
         $active = $request->get('active');
         if ($hire['active']) {
-            $hire['from'] = $hire['from']!=''  ? Carbon::createFromFormat('Y-m-d', $hire['from']) : Carbon::now()->startOfYear()->startOfMonth();
-            $hire['to'] = $hire['to']!=''  ? Carbon::createFromFormat('Y-m-d', $hire['to'])->addDay() : Carbon::now()->addMonth()->startOfMonth();
+            $hire['from'] = $hire['from'] != '' ? Carbon::createFromFormat('Y-m-d', $hire['from']) : Carbon::now()->startOfYear()->startOfMonth();
+            $hire['to'] = $hire['to'] != '' ? Carbon::createFromFormat('Y-m-d', $hire['to'])->addDay() : Carbon::now()->addMonth()->startOfMonth();
         }
         if ($birthdate['active']) {
 
-            $birthdate['from'] = $birthdate['from'] !='' ? Carbon::createFromFormat('Y-m-d', $birthdate['from']) : Carbon::now()->startOfMonth();
-            $birthdate['to'] = $birthdate['to']!='' ? Carbon::createFromFormat('Y-m-d', $birthdate['to'])->addDay() : Carbon::now()->addMonth()->startOfMonth();
+            $birthdate['from'] = $birthdate['from'] != '' ? Carbon::createFromFormat('Y-m-d', $birthdate['from']) : Carbon::now()->startOfMonth();
+            $birthdate['to'] = $birthdate['to'] != '' ? Carbon::createFromFormat('Y-m-d', $birthdate['to'])->addDay() : Carbon::now()->addMonth()->startOfMonth();
 
         }
 
@@ -189,7 +189,16 @@ class WorkerController extends Controller
     public function destroy($id)
     {
         try {
-            Worker::find($id)->update(['status'=>0]);
+            $bonus = DB::table('bonus_payroll')->join('detail_bonus', 'detail_bonus.id', '=', 'bonus_payroll.id_detail_bonus')
+                ->join('bonus', 'bonus.id', '=', 'detail_bonus.id_bonus')
+                ->where('bonus_payroll.id_worker', '=', $id)
+                ->get();
+            $reports = DB::table('report as r')->where('r.id_worker', $id)->get();
+            if (count($bonus)>0||count($reports)>0){
+                Worker::find($id)->update(['active' => 0]);
+            }else{
+                Worker::find($id)->delete();
+            }
             return response()->json([
                 'status' => 1,
                 'message' => 'Worker successfully removed'

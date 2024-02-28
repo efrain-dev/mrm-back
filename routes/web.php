@@ -62,13 +62,6 @@ $router->group(['prefix' => 'api', 'middleware' => 'auth'], function () use ($ro
         $router->post('', 'Catalogos\DetailController@newDetail');
         $router->delete('/{id}/delete', 'Catalogos\DetailController@deleteReport');
     });
-    $router->group(['prefix' => 'link'], function () use ($router) {
-        $router->get('', 'Catalogos\LinkController@index');
-        $router->get('/get/{id}', 'Catalogos\LinkController@show');
-        $router->post('', 'Catalogos\LinkController@store');
-        $router->put('/{id}', 'Catalogos\LinkController@update');
-        $router->delete('/{id}/delete', 'Catalogos\LinkController@destroy');
-    });
     $router->group(['prefix' => 'config'], function () use ($router) {
         $router->get('', 'Catalogos\ConfigController@index');
         $router->put('', 'Catalogos\ConfigController@update');
