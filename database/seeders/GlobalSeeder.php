@@ -84,9 +84,9 @@ class GlobalSeeder extends Seeder
 
         DB::table('worker')->insert([
                 [ 'date_in'=>'01/01/2000','date_out'=>'15/01/2000','birthdate'=>'15/01/2000','name'=>'Roberto','last_name'=>'Carlos','salary'=>10,'social_number'=>'38437434873483'
-                    , 'rate_night'=>15,'email'=>"correo@gmail.com","address"=>"Direccion",'contact'=>'Contacto','cel'=>'565633543'],
+                    , 'rate_night'=>15,'email'=>"efraindeleon12@outlook.com","address"=>"Direccion",'contact'=>'Contacto','cel'=>'565633543'],
                 [ 'date_in'=>'01/01/2000','date_out'=>'15/01/2000','birthdate'=>'15/01/2000','name'=>'Marco','last_name'=>'Polo','salary'=>10,'social_number'=>'38437434873483'
-                    , 'rate_night'=>15,'email'=>"correo2@gmail.com","address"=>"Direccion",'contact'=>'Contacto','cel'=>'565633543']
+                    , 'rate_night'=>15,'email'=>"xlsymphonylx@gmail.com","address"=>"Direccion",'contact'=>'Contacto','cel'=>'565633543']
             ]
         );
 

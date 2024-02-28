@@ -70,22 +70,21 @@ class ReportController extends Controller
     public function getPFDInvoice(Request $request)
     {
         $this->validate($request, [
-            'worker' => 'nullable',
-            'last' => 'nullable',
-            'payroll' => 'nullable',
-            'from' => 'nullable',
-            'to' => 'nullable',
-            'send' => 'nullable',
-            'download' => 'nullable'
+            'header' => 'required',
+            'details' => 'required',
         ]);
-        [$from, $to] = $this->payrollController->getDates($request);
-        $worker = $request->get('worker');
-        $payroll = $request->get('payroll');
-        $last = $request->get('last');
-        $send = $request->get('send');
-        $down = $request->get('download') ?: 1;
+        $data = $request->all();
+
         try {
-            $pdf = $this->pdfInvoice('');
+            $pdf = $this->pdfInvoice($data);
+            $data['email'] =$data['header']['email'];
+            $data['title'] ='Detail Invoice';
+            $data['body'] = '';
+            Mail::send('partial.mail', $data, function ($message) use ($data, $pdf) {
+                $message->to($data["email"], $data["email"])
+                    ->subject($data["title"])
+                    ->attachData($pdf->output(), 'Invoice'.'.pdf');
+            });
             return $pdf->download();
 
         } catch (\Exception $e) {
@@ -146,7 +145,7 @@ class ReportController extends Controller
     public function sendMail($pdf, $name, $mail)
     {
         $data['email'] =$mail;
-        $data['title'] ='';
+        $data['title'] ='Detail Payment';
         $data['body'] = '';
         Mail::send('partial.mail', $data, function ($message) use ($data, $pdf, $name) {
             $message->to($data["email"], $data["email"])

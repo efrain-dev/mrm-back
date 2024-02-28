@@ -45,7 +45,6 @@ $router->group(['prefix' => 'api', 'middleware' => 'auth'], function () use ($ro
         $router->delete('/{id}/delete', 'Catalogos\WorkerController@destroy');
         $router->get('/send-email', 'Catalogos\WorkerController@sendEmail');
         $router->get('/pay-worker', 'ReportController@getPFDWorker');
-
     });
     $router->group(['prefix' => 'payroll'], function () use ($router) {
         $router->get('', 'Catalogos\PayrollController@index');
@@ -57,7 +56,6 @@ $router->group(['prefix' => 'api', 'middleware' => 'auth'], function () use ($ro
         $router->get('/worker', 'Catalogos\PayrollController@getWorkerApi');
         $router->get('/pdf', 'ReportController@getPDFPayroll');
         $router->delete('/{id}/delete', 'Catalogos\PayrollController@destroy');
-
     });
     $router->group(['prefix' => 'detail'], function () use ($router) {
         $router->get('', 'Catalogos\DetailController@getReport');
@@ -75,7 +73,7 @@ $router->group(['prefix' => 'api', 'middleware' => 'auth'], function () use ($ro
         $router->get('', 'Catalogos\ConfigController@index');
         $router->put('', 'Catalogos\ConfigController@update');
     });
-    $router->get('/send-invoice', 'ReportController@getPFDInvoice');
+    $router->post('/send-invoice', 'ReportController@getPFDInvoice');
     $router->get('/copy', 'Catalogos\ConfigController@copyBD');
     $router->get('/up', 'Catalogos\ConfigController@upBD');
     $router->get('/create', 'Catalogos\ConfigController@createCarpetas');
