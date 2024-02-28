@@ -140,6 +140,8 @@
             <tbody>
             @php($num = 1)
             @php($total = 0)
+            @php($subtotal = 0)
+
             @foreach( $data['details'] as $item)
                 <tr>
                     <td>{{$num}}</td>
@@ -148,8 +150,9 @@
                     <td>{!!$item['SKU']?:''!!}</td>
                     <td>{!!$item['QTY']?:''!!}</td>
                     <td>{!!$item['rate']?:''!!}</td>
-                    <td>{!!$item['amount']?:''!!}</td>
-                    @php($total += is_numeric($item['amount'])?$item['amount']:0)
+                    @php($subtotal=   $item['QTY']  *$item['rate'])
+                    <td>{{$subtotal}}</td>
+                    @php($total += $subtotal)
                 </tr>
                 @php($num++)
             @endforeach
