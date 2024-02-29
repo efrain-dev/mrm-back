@@ -140,6 +140,8 @@ class BonusController extends Controller
     {
         $this->validate($request, [
             'bonus' => 'required',
+            'payroll' => 'required',
+            'worker' => 'required',
         ]);
         try {
             $message = DB::transaction(function () use ($request) {
