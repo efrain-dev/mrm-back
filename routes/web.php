@@ -56,6 +56,7 @@ $router->group(['prefix' => 'api', 'middleware' => 'auth'], function () use ($ro
         $router->get('/worker', 'Catalogos\PayrollController@getWorkerApi');
         $router->get('/pdf', 'ReportController@getPDFPayroll');
         $router->delete('/{id}/delete', 'Catalogos\PayrollController@destroy');
+
     });
     $router->group(['prefix' => 'detail'], function () use ($router) {
         $router->get('', 'Catalogos\DetailController@getReport');

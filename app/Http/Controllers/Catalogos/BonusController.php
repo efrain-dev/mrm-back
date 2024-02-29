@@ -40,7 +40,7 @@ class BonusController extends Controller
             ->join('bonus', 'bonus.id', '=', 'detail_bonus.id_bonus')
             ->where('bonus_payroll.id_payroll', $request->get('payroll'))
             ->where('bonus_payroll.id_worker', $request->get('worker'))
-            ->select('detail_bonus.amount', 'detail_bonus.date', 'bonus_payroll.id', 'bonus.name as bonus', 'bonus.type')->get();
+            ->select('detail_bonus.amount', 'detail_bonus.date', 'detail_bonus.id', 'bonus.name as bonus', 'bonus.type')->get();
         return response()->json($query);
     }
 
@@ -139,8 +139,6 @@ class BonusController extends Controller
     public function deleteBonus(Request $request)
     {
         $this->validate($request, [
-            'payroll' => 'required',
-            'worker' => 'required',
             'bonus' => 'required',
         ]);
         try {
@@ -148,7 +146,8 @@ class BonusController extends Controller
                 $detail = DB::table('bonus_payroll')
                     ->where('id_detail_bonus', $request->get('bonus'))
                     ->where('id_payroll', $request->get('payroll'))
-                    ->where('id_worker', $request->get('worker'))->get();
+                    ->where('id_worker', $request->get('worker'))
+                    ->get();
                 foreach ($detail as $item) {
                     PayrollBonus::find($item->id)->delete();
                 }
