@@ -18,14 +18,16 @@
 $router->get('/', function () use ($router) {
     return $router->app->version();
 });
-$router->get('/logo', function () use ($router) {
-    $path    =   app()->basePath('public') . '/asset/Logo.png';
-    return $path;
+
+$router->get('/health', function () use ($router) {
+    return response(['status' => 'error', 'message' => 'Exito'], 200);
 });
+
 $router->group(['prefix' => 'api'], function () use ($router) {
     $router->post('login', 'LumenAuthController@login');
     $router->post('logout', 'LumenAuthController@logout');
     $router->post('refresh', 'LumenAuthController@refresh');
+
 });
 $router->group(['prefix' => 'api', 'middleware' => 'auth'], function () use ($router) {
     $router->group(['prefix' => 'bonus'], function () use ($router) {
