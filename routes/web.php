@@ -29,7 +29,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->post('refresh', 'LumenAuthController@refresh');
 
 });
-$router->group(['prefix' => 'api', 'middleware' => 'auth'], function () use ($router) {
+$router->group(['prefix' => 'api'], function () use ($router) {
     $router->group(['prefix' => 'bonus'], function () use ($router) {
         $router->get('/get/{type}', 'Catalogos\BonusController@index');
         $router->get('/get-bonus', 'Catalogos\BonusController@getBonus');
