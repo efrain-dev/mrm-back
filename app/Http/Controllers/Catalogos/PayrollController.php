@@ -325,7 +325,7 @@ class PayrollController extends Controller
         }
         $total_hours = $regular_hours + $extra_hours + $night_hours + $overtime_night_hours;
         [$bon, $desc, $detail_bonus] = $this->getBon($payroll, $item->id_worker);
-        $period_regular = $rate * $total_hours;
+        $period_regular = $rate * $regular_hours;
         $overtime_regular = (($rate * ($bonusPer->firstWhere('name', '=', 'Overtime Hours')->amount / 100)) + $rate) * $extra_hours;
         $net_pay = $period_regular + $night + $overtime_regular + $overtime_night;
         $subtotal = $net_pay + $bon;
@@ -350,6 +350,7 @@ class PayrollController extends Controller
 
     private function getBonPermament($payroll)
     {
+
         return DB::table('bonus_payroll')->join('detail_bonus', 'detail_bonus.id', '=', 'bonus_payroll.id_detail_bonus')
             ->join('bonus', 'bonus.id', '=', 'detail_bonus.id_bonus')
             ->where('bonus_payroll.id_payroll', '=', $payroll)
@@ -373,7 +374,6 @@ class PayrollController extends Controller
             $data = $request->all();
             $data['start'] = Carbon::createFromFormat('Y-m-d', $data['start']);
             $data['end'] = Carbon::createFromFormat('Y-m-d', $data['end']);
-            $data['users_id'] = $request->user()->id;
             $payroll = Payroll::create($data);
             $global = DB::table('bonus')->join('detail_bonus', 'detail_bonus.id_bonus', '=', 'bonus.id')->where('permanent', '=', true)
                 ->where('active', '=', 1)->select('detail_bonus.id as id')->get();
