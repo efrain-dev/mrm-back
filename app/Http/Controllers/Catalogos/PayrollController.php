@@ -9,7 +9,6 @@ use App\Models\Payroll;
 use App\Models\PayrollBonus;
 use App\Models\Report;
 use App\Models\Worker;
-use App\Models\WorkerBonus;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -164,7 +163,6 @@ class PayrollController extends Controller
             ->select('p.*')
             ->where('r.id_worker', $id)
             ->groupBy('p.id');
-
         if ($payroll) {
             $payroll = $query->where('r.id_payroll', '=', $payroll)->get();
         } else {
@@ -174,6 +172,7 @@ class PayrollController extends Controller
                 $payroll = $query->whereDate("p.start", '>=', $from)->whereDate("p.end", '<=', $to)->get();
             }
         }
+
         $worker = DB::table('worker as w')
             ->where('w.id', $id)
             ->select('w.name', 'w.last_name', 'w.id as id_worker')->first();
@@ -195,6 +194,11 @@ class PayrollController extends Controller
             $item->overtime_night_hours = $overtime_night_hours;
             $item->period_regular = $period_regular;
             $item->night = $night;
+            $item->overtime_regular = $overtime_regular;
+            $item->rate_night = $rate_night;
+            $item->overtime_night = $overtime_night;
+            $item->rate = $rate;
+            $item->subtotal = $subtotal;
         });
         return [
             'net_pay' => $payroll->sum('net_pay'),

@@ -16,28 +16,28 @@ class GlobalSeeder extends Seeder
     public function run()
     {
         DB::table('bonus')->insert([
-                ['name' => 'NCDOR','type'=>'D','permanent'=>true],
-                ['name' => 'Night hours','type'=>'D','permanent'=>true],
-                ['name' => 'Overtime Hours','type'=>'D','permanent'=>true],
-                ['name' => 'Overtime night','type'=>'D','permanent'=>true],
+                ['name' => 'NCDOR', 'type' => 'D', 'permanent' => true],
+                ['name' => 'Night hours', 'type' => 'D', 'permanent' => true],
+                ['name' => 'Overtime Hours', 'type' => 'D', 'permanent' => true],
+                ['name' => 'Overtime night', 'type' => 'D', 'permanent' => true],
             ]
         );
         DB::table('detail_bonus')->insert([
-                ['id_bonus' => 1, 'calc'=>2,'amount'=>'4','date'=>Carbon::createFromFormat('Y-m-d', '2023-01-15')],
-                ['id_bonus' => 2, 'calc'=>2,'amount'=>'25','date'=>Carbon::createFromFormat('Y-m-d', '2023-01-15')],
-                ['id_bonus' => 3, 'calc'=>2,'amount'=>'50','date'=>Carbon::createFromFormat('Y-m-d', '2023-01-15')],
-                ['id_bonus' => 4, 'calc'=>2,'amount'=>'50','date'=>Carbon::createFromFormat('Y-m-d', '2023-01-15')],
+                ['id_bonus' => 1, 'calc' => 2, 'amount' => '4', 'date' => Carbon::createFromFormat('Y-m-d', '2023-01-15')],
+                ['id_bonus' => 2, 'calc' => 2, 'amount' => '25', 'date' => Carbon::createFromFormat('Y-m-d', '2023-01-15')],
+                ['id_bonus' => 3, 'calc' => 2, 'amount' => '50', 'date' => Carbon::createFromFormat('Y-m-d', '2023-01-15')],
+                ['id_bonus' => 4, 'calc' => 2, 'amount' => '50', 'date' => Carbon::createFromFormat('Y-m-d', '2023-01-15')],
 
             ]
         );
         DB::table('config')->insert([
-                ['id'=>1, 'title_videos'=>'Important Links for Your Review' , 'videos' => 'I hope this message finds you well. I am writing to share some important links that I believe will be beneficial for your current projects and ongoing professional development. Please take a moment to review the following resources:',
-                  'title_pay'=>'Details of Your Pay Statement' ,
-                'pay'=>"I hope this message finds you well. I am reaching out to provide you with detailed information regarding the deductions, bonuses, and the total amount received in your recent pay statement."
+                ['id' => 1, 'title_videos' => 'Important Links for Your Review', 'videos' => 'I hope this message finds you well. I am writing to share some important links that I believe will be beneficial for your current projects and ongoing professional development. Please take a moment to review the following resources:',
+                    'title_pay' => 'Details of Your Pay Statement',
+                    'pay' => "I hope this message finds you well. I am reaching out to provide you with detailed information regarding the deductions, bonuses, and the total amount received in your recent pay statement."
                 ],
             ]
         );
-//
+
 //        DB::table('link')->insert([
 //                ['name' => "https://www.youtube.com/watch?v=JxS5E-kZc2s"],
 //                ['name' => "https://www.youtube.com/watch?v=u0XHVssfsYM"],
@@ -114,5 +114,6 @@ class GlobalSeeder extends Seeder
 //                ]
 //            );
 //
-  }
+//  }
+    }
 }

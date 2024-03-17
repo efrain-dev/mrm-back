@@ -49,7 +49,7 @@ class ReportController extends Controller
                 $this->sendMail($pdf, $name, $worker->email);
             }
             if ($down == 1) {
-                return $pdf->download();
+                return $pdf->stream();
             }else{
                 return response()->json([
                     'status' => 1,

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <style>
@@ -23,7 +22,6 @@
     .header-pdf {
         font-size: 0.7rem;
         text-align: center;
-
 
 
     }
@@ -65,17 +63,17 @@
     }
 
 
-
-
     .header {
         font-size: 10px;
         border: solid 1px black;
         background-color: #D9D9D9;
     }
+
     .tbody {
         border: solid 1px black;
 
     }
+
     .tr-final {
         border: solid 1px black;
 
@@ -91,12 +89,14 @@
 
 
     }
+
     .item-border {
 
         border-top: black solid 1px;
         border-bottom: black solid 1px;
 
     }
+
     .item-center {
         font-size: 0.6rem;
         text-align: center;
@@ -133,70 +133,80 @@
 
 <header>
 
-    <h4 class="titulo1 titulos"><strong style="margin-right: 500px">{{$data['worker']->name}} {{$data['worker']->last_name}}</strong>  <strong>Gross pay: ${{number_format($data['gross_pay'])}}</strong> </h4>
+    <h3 style="text-align: center">MRM ELECTRIC LLC</h3>
+    <h4 class="titulo1 titulos"><strong
+            style="margin-right: 500px">{{$data['worker']->name}} {{$data['worker']->last_name}}</strong> <strong>Gross
+            pay: ${{number_format($data['gross_pay'])}}</strong></h4>
     <h4 class="titulo1 titulos">Extended: {{\Carbon\Carbon::now()->format('d/m/Y')}}</h4>
 
 
 </header>
 <main>
-    <h4 class="titulo1 titulos" style="margin-bottom: 10px;margin-top: 10px;"><strong>Hours</strong> </h4>
+    <h4 class="titulo1 titulos" style="margin-bottom: 10px;margin-top: 10px;"><strong>Payroll</strong></h4>
 
     <table class="table">
-        <thead >
+        <thead>
         <tr class="header">
-            <th style="width: 180px" >Date</th>
-            <th >Regular hours</th>
-            <th >Night hours</th>
-            <th >Overtime night hours</th>
-            <th >Night overtime </th>
-            <th >Total</th>
+            <th style="width: 180px">Date</th>
+            <th>Rate</th>
+            <th>Night Rate</th>
+            <th>Regular hours</th>
+            <th>Overtime hours</th>
+            <th>Night Overtime</th>
+            <th>Night hours</th>
+            <th>Extra bonifications</th>
+            <th>Net pay</th>
+            <th>NCDOR</th>
+            <th>Extra deductions</th>
+            <th>Subtotal</th>
+            <th>Gross pay</th>
+
         </tr>
         </thead>
-        <tbody >
+        <tbody>
         @php($total = 0)
         @foreach($data['payroll'] as $item)
-            <tr >
-                <td class="tr_item-none-start item">{{\Carbon\Carbon::parse($item->start)->format('d/m/Y')}}-{{\Carbon\Carbon::parse($item->end)->format('d/m/Y')}}</td>
-                <td class="item-border item">{{number_format($item->regular_hours)}}</td>
-                <td class="item-border item">{{number_format($item->night_hours)}}</td>
-                <td class="item-border item">{{number_format($item->extra_hours)}}</td>
-                <td class="item-border item">{{number_format($item->overtime_night_hours)}}</td>
-                <td class="tr_item-none-end item">{{number_format($item->total_hours)}}</td>
+            <tr>
+                <td class="tr_item-none-start item">{{\Carbon\Carbon::parse($item->start)->format('d/m/Y')}}
+                    -{{\Carbon\Carbon::parse($item->end)->format('d/m/Y')}}</td>
+                <td class="item-border item">{{$item->rate}} </td>
+                    <td class="item-border item">{{$item->rate_night}} </td>
+                <td class="item-border item">{{$item->regular_hours}} </td>
+                <td class="item-border item">{{$item->extra_hours}} </td>
+                    <td class="item-border item">{{$item->overtime_night_hours}} </td>
+                <td class="item-border item">{{$item->night_hours}} </td>
+                <td class="item-border item">${{number_format($item->bon,2)}} </td>
+                <td class="item-border item">${{number_format($item->net_pay,2)}} </td>
+                <td class="item-border item">${{number_format($item->ncdor,2)}} </td>
+                <td class="item-border item">${{number_format($item->desc,2)}} </td>
+                <td class="item-border item">${{number_format($item->subtotal,2)}} </td>
+                <td class="tr_item-none-end item">${{number_format($item->gross_pay)}}</td>
                 @php($total+=$item->total_hours)
             </tr>
 
         @endforeach
 
 
-        <tr>
-
-            <td class="tr_item-none-start item"></td>
-            <td class="item-border item"></td>
-            <td class="item-border item"></td>
-            <td class="item-border item"></td>
-            <td class="item-border item">Total</td>
-            <td class="tr_item-none-end item">{{$total}}</td>
-        </tr>
-
 
         </tbody>
     </table>
-    <h4 class="titulo1 titulos" style="margin-bottom: 10px;margin-top: 10px;"><strong>Bonifications and deductions</strong> </h4>
+    <h4 class="titulo1 titulos" style="margin-bottom: 10px;margin-top: 10px;"><strong>Bonifications and
+            deductions</strong></h4>
 
     <table class="table">
-        <thead >
+        <thead>
         <tr class="header">
-            <th style="width: 180px" >Name</th>
-            <th >Type</th>
-            <th >Date</th>
-            <th >Mount</th>
+            <th style="width: 180px">Name</th>
+            <th>Type</th>
+            <th>Date</th>
+            <th>Amount</th>
         </tr>
         </thead>
-        <tbody >
+        <tbody>
         @php($bon = 0)
 
         @foreach($data['payroll'] as $item)
-            <tr >
+            <tr>
                 <td class="tr_item-none-start item">NCDOR</td>
                 <td class="item-border item">Deduction</td>
                 <td class="item-border item">{{\Carbon\Carbon::parse($item->start)->format('d/m/Y')}}</td>
@@ -208,7 +218,7 @@
         @foreach($data['payroll'] as $item)
             @foreach($item->detail_bonus as $res)
 
-                <tr >
+                <tr>
                     <td class="tr_item-none-start item">{{$res->name}}</td>
                     <td class="item-border item">{{$res->type=='D'?'Deduction':'Bonification'}}</td>
                     <td class="item-border item">{{\Carbon\Carbon::parse($res->date)->format('d/m/Y')}}</td>
@@ -233,35 +243,33 @@
     </table>
 
 
-    <h4 class="titulo1 titulos" style="margin-bottom: 10px;margin-top: 10px;"><strong>Year to date</strong> </h4>
+    <h4 class="titulo1 titulos" style="margin-bottom: 10px;margin-top: 10px;"><strong>Year to date</strong></h4>
 
     <table class="table">
-        <thead >
+        <thead>
         <tr class="header">
-            <th style="width: 180px" >Name</th>
-            <th >Mount</th>
+            <th style="width: 180px">Name</th>
+            <th>Mount</th>
         </tr>
         </thead>
-        <tbody >
+        <tbody>
         @php($total = 0)
         <tr>
-            <td class="tr_item-none-start item">Gross pay</td>
-            <td class="tr_item-none-end item">{{$data['gross_pay']}}</td>
+            <td class="tr_item-none-start item">Extra deductions</td>
+            <td class="tr_item-none-end item">{{$data['desc']}}</td>
         </tr>
         <tr>
             <td class="tr_item-none-start item">Extra bonification</td>
             <td class="tr_item-none-end item">{{$data['bon']}}</td>
         </tr>
         <tr>
+            <td class="tr_item-none-start item">Gross pay</td>
+            <td class="tr_item-none-end item">{{$data['gross_pay']}}</td>
+        </tr>
+        <tr>
             <td class="tr_item-none-start item">NCDOR</td>
             <td class="tr_item-none-end item">{{$data['ncdor']}}</td>
         </tr>
-        <tr>
-            <td class="tr_item-none-start item">Extra deductions</td>
-            <td class="tr_item-none-end item">{{$data['desc']}}</td>
-        </tr>
-
-
         </tbody>
     </table>
 </main>
