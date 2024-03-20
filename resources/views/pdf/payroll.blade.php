@@ -11,7 +11,7 @@
     header {
         margin: 0;
         padding: 0;
-        font-size: 0.7rem;
+        font-size: 0.8rem;
 
     }
 
@@ -30,6 +30,8 @@
 
     .titulo1 {
         font-weight: 0;
+        font-size: 1rem;
+
     }
 
     .firma {
@@ -71,7 +73,7 @@
 
 
     .header {
-        font-size:  0.6rem;
+        font-size:  0.8rem;
         border: solid 1px black;
         background-color: #D9D9D9;
     }
@@ -89,7 +91,7 @@
     }
 
     .item {
-        font-size: 0.6rem;
+        font-size: 1rem;
         text-align: center;
 
 
@@ -137,7 +139,7 @@
 <header>
     <h4 class="titulo1 titulos" style="text-align: center"><strong>{{$data['payroll']->type=="D"?'Normal Payroll':'Night Payroll'}}</h4>
     <h4 class="titulo1 titulos"><strong>{{$data['payroll']->description}} </h4>
-    <h4 class="titulo1 titulos"><strong style="margin-right: 550px">{{\Carbon\Carbon::parse($data['payroll']->start)->format('d/m/Y')}}-{{\Carbon\Carbon::parse($data['payroll']->end)->format('d/m/Y')}}</strong>  <strong>{{$data['payroll']->id}}</strong> </h4>
+    <h4 class="titulo1 titulos"><strong style="margin-right: 500px">{{\Carbon\Carbon::parse($data['payroll']->start)->format('d/m/Y')}}-{{\Carbon\Carbon::parse($data['payroll']->end)->format('d/m/Y')}}</strong>  <strong>{{$data['payroll']->id}}</strong> </h4>
 </header>
 <main>
 

@@ -5,12 +5,13 @@
         margin-top: 20px;
         margin-bottom: 30px;
         padding: 0;
+        font-size: 1rem;
+
     }
 
     header {
         margin: 0;
         padding: 0;
-        font-size: 0.7rem;
 
     }
 
@@ -32,7 +33,6 @@
 
     .firma {
         font-weight: 0;
-        font-size: 0.7rem;
 
     }
 
@@ -64,7 +64,8 @@
 
 
     .header {
-        font-size: 10px;
+        font-size: 0.8rem;
+
         border: solid 1px black;
         background-color: #D9D9D9;
     }
@@ -84,7 +85,6 @@
     }
 
     .item {
-        font-size: 0.6rem;
         text-align: center;
 
 
@@ -147,7 +147,7 @@
     <table class="table">
         <thead>
         <tr class="header">
-            <th style="width: 180px">Date</th>
+            <th style="width: 120px">Period Starting-Period Ending</th>
             <th>Rate</th>
             <th>Night Rate</th>
             <th>Regular hours</th>
@@ -155,11 +155,13 @@
             <th>Night Overtime</th>
             <th>Night hours</th>
             <th>Extra bonifications</th>
-            <th>Net pay</th>
+            <th>Gross pay</th>
+
             <th>NCDOR</th>
             <th>Extra deductions</th>
             <th>Subtotal</th>
-            <th>Gross pay</th>
+            <th>Net pay</th>
+
 
         </tr>
         </thead>
@@ -176,11 +178,12 @@
                     <td class="item-border item">{{$item->overtime_night_hours}} </td>
                 <td class="item-border item">{{$item->night_hours}} </td>
                 <td class="item-border item">${{number_format($item->bon,2)}} </td>
-                <td class="item-border item">${{number_format($item->net_pay,2)}} </td>
+                <td class="item-border item">${{number_format($item->gross_pay)}}</td>
                 <td class="item-border item">${{number_format($item->ncdor,2)}} </td>
                 <td class="item-border item">${{number_format($item->desc,2)}} </td>
                 <td class="item-border item">${{number_format($item->subtotal,2)}} </td>
-                <td class="tr_item-none-end item">${{number_format($item->gross_pay)}}</td>
+                <td class="tr_item-none-end item">${{number_format($item->net_pay,2)}} </td>
+
                 @php($total+=$item->total_hours)
             </tr>
 
@@ -249,7 +252,7 @@
         <thead>
         <tr class="header">
             <th style="width: 180px">Name</th>
-            <th>Mount</th>
+            <th>Amount</th>
         </tr>
         </thead>
         <tbody>

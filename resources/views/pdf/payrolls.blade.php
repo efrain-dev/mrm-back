@@ -11,7 +11,7 @@
     header {
         margin: 0;
         padding: 0;
-        font-size: 0.7rem;
+        font-size: 0.8rem;
 
     }
 
@@ -29,6 +29,8 @@
     }
 
     .titulo1 {
+        font-size: 1rem;
+
         font-weight: 0;
     }
 
@@ -71,7 +73,7 @@
 
 
     .header {
-        font-size:  0.6rem;
+        font-size:  0.8rem;
         border: solid 1px black;
         background-color: #D9D9D9;
     }
@@ -89,7 +91,7 @@
     }
 
     .item {
-        font-size: 0.6rem;
+        font-size: 1rem;
         text-align: center;
 
 
