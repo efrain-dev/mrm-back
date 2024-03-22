@@ -210,5 +210,16 @@ class WorkerController extends Controller
             ], 500);
         }
     }
-
+    public function toggleStatus($id){
+        try {
+         $worker =   Worker::find($id);
+         $worker->update(['active' => $worker['active'] == 0 ? 1 : 0]);
+        }
+      catch (\Illuminate\Database\QueryException $e) {
+        return response()->json([
+            'status' => 0,
+            'message' => 'An exception has occurred' . $e->getMessage()
+        ], 500);
+    }
+    }
 }

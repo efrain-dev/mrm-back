@@ -45,6 +45,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         $router->post('', 'Catalogos\WorkerController@store');
         $router->put('/{id}', 'Catalogos\WorkerController@update');
         $router->delete('/{id}/delete', 'Catalogos\WorkerController@destroy');
+        $router->put('/{id}/toggleStatus', 'Catalogos\WorkerController@toggleStatus');
         $router->get('/send-email', 'Catalogos\WorkerController@sendEmail');
         $router->get('/pay-worker', 'ReportController@getPFDWorker');
     });
