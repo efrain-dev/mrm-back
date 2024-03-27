@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Catalogos;
 
 use App\Http\Controllers\Controller;
+use App\Imports\PayrollImport;
 use App\Models\Bonus;
 use App\Models\BonusDetail;
 use App\Models\Payroll;
 use App\Models\PayrollBonus;
 use App\Models\Report;
 use App\Models\Worker;
+use Excel;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -47,15 +49,15 @@ class PayrollController extends Controller
         $payroll = $query->select('p.*', 'p.id as no')->get();
         $payroll = $this->mapPayroll($payroll);
 
-        $result = ['desc' => $payroll->sum('desc') ,
-       'bon' => $payroll->sum('bon'),
-        'net_pay' => $payroll->sum('net_pay'),
-        'ncdor' => $payroll->sum('ncdor'),
-        'total' => $payroll->sum('total'),
-        'gross_pay' => $payroll->sum('gross_pay')
+        $result = ['desc' => $payroll->sum('desc'),
+            'bon' => $payroll->sum('bon'),
+            'net_pay' => $payroll->sum('net_pay'),
+            'ncdor' => $payroll->sum('ncdor'),
+            'total' => $payroll->sum('total'),
+            'gross_pay' => $payroll->sum('gross_pay')
         ];
 
-        return response()->json(['items'=>$payroll,'total'=>$result]);
+        return response()->json(['items' => $payroll, 'total' => $result]);
     }
 
     public function getOrder(Request $request)
@@ -225,8 +227,8 @@ class PayrollController extends Controller
     {
         $from = $request->get('from');
         $to = $request->get('to');
-        $from = $from !='' ? Carbon::createFromFormat('Y-m-d', $from) : Carbon::now()->startOfYear()->subDay();
-        $to = $to !='' ? Carbon::createFromFormat('Y-m-d', $to)->addDay() : Carbon::now()->endOfDecade();
+        $from = $from != '' ? Carbon::createFromFormat('Y-m-d', $from) : Carbon::now()->startOfYear()->subDay();
+        $to = $to != '' ? Carbon::createFromFormat('Y-m-d', $to)->addDay() : Carbon::now()->endOfDecade();
         return [$from, $to];
     }
 
@@ -365,6 +367,16 @@ class PayrollController extends Controller
 
     }
 
+    public function upExcel(Request $request)
+    {
+        $this->validate($request, [
+            'payrolls' => 'required',
+        ]);
+
+
+
+    }
+
     public function newPayroll(Request $request)
     {
 
@@ -404,7 +416,7 @@ class PayrollController extends Controller
         try {
             $payroll = Payroll::find($id);
             if ($payroll->status == 'O') {
-                $message = DB::transaction(function () use ($id,$payroll) {
+                $message = DB::transaction(function () use ($id, $payroll) {
                     $detail = DB::table('bonus_payroll')
                         ->where('id_payroll', $id)->get();
                     foreach ($detail as $item) {
